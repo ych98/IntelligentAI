@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "IntelligentAI.ClientStub": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}

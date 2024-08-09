@@ -1,0 +1,45 @@
+﻿.chat-container {
+    display: flex; /* 使用Flex布局 */
+    flex-direction: column; /* 子元素垂直排列 */
+    justify-content: flex-end; /* 内容垂直方向靠下 */
+    height: calc(100dvh - 66px); /* 设置容器高度为视口高度 */
+}
+
+.input-container {
+    display: flex;
+    align-items: center;
+    padding: 5px;
+    border-top: 1px solid #ccc;
+    background-color: #fff;
+    padding-bottom: env(safe-area-inset-bottom);
+}
+
+.messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 5px;
+}
+
+.message {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 16px;
+}
+
+    .message.user {
+        flex-direction: row-reverse;
+        justify-content: flex-end;
+        margin-bottom: 16px;
+    }
+
+::deep .avatar.user {
+    margin-left: 10px !important;
+}
+
+::deep .avatar.assistant {
+    margin-right: 10px !important;
+}
+
+::deep .avatar {
+    margin-top: 15px !important;
+}

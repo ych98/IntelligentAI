@@ -1,0 +1,51 @@
+﻿@page "/markdown"
+
+<PageTitle>Markdown</PageTitle>
+
+<h1>Markdown</h1>
+
+<IntelligentAI.Components.Pages.MarkdownDisplay Input="@_input" />
+
+@code {
+    private string? _input = @"
+# 标题1
+
+这是一个一级标题。
+
+## 标题2
+
+这是一个二级标题。
+
+### 标题3
+
+这是一个三级标题。
+
+**粗体文本**
+
+*斜体文本*
+
+~~删除线文本~~
+
+> 这是一个引用块。
+
+- 无序列表项1
+- 无序列表项2
+- 无序列表项3
+
+1. 有序列表项1
+2. 有序列表项2
+3. 有序列表项3
+
+这是一个链接
+
+!这是一个图片
+
+这是行内代码 `code`
+
+```python
+# 这是一个代码块
+def hello_world():
+    print(""Hello, world!"")
+```
+";
+}

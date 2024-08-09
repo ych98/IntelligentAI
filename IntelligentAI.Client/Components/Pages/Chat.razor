@@ -1,0 +1,231 @@
+﻿@page "/chat"
+
+@using IntelligentAI.Sdk
+
+<PageTitle>Chat</PageTitle>
+
+
+@inject IAiModelService ModelService
+@inject IToastService ToastService
+@inject IJSRuntime JsRuntime
+
+<div class="chat-container" >
+
+    <h1>Chat Room</h1>
+
+    <div id="messageContainer" class="messages">
+
+        <div class="message">
+            <FluentPersona Class="@GetAvatarStyle("assistant")"
+                           Image="@GetAvatarUrl("assistant")"
+                           ImageSize="32px" />
+            <MarkdownSection Content="你好！我是小凡，你的专属智能助手，有问题尽管问我吧!" />
+        </div>
+
+        @foreach (var message in messages)
+        {
+            <div class="message @(message.Role == "user" ? "user" : "")">
+                <FluentPersona Class="@GetAvatarStyle(message.Role)" Image="@GetAvatarUrl(@message.Role)" ImageSize="32px" />
+                <MarkdownSection Content="@message.Content" />
+            </div>
+        }
+
+        <div class="message">
+            <FluentPersona Class="@GetAvatarStyle("assistant")"
+                           hidden="@string.IsNullOrWhiteSpace(_currentStreamMessage)"
+                           Image="@GetAvatarUrl("assistant")"
+                           ImageSize="32px" />
+            <MarkdownSection Content="@_currentStreamMessage" />
+        </div>
+    </div>
+
+    <div class="input-container">
+
+        <div style="position: relative; width: 100%;">
+            <!-- ClearAsync Button outside the input box on the left -->
+            <FluentButton style="position: absolute; top: 50%; transform: translateY(-50%);"
+                          IconStart="@(new Icons.Regular.Size16.ArrowClockwise())"
+                          Appearance="Appearance.Accent"
+                          OnClick="ClearAsync">
+            </FluentButton>
+
+            <!-- Text Area -->
+            <FluentTextArea id="textArea"
+                Rows="@_rows"
+                Value="@_inputMessage" 
+                Disabled="@(_loading)" 
+                Placeholder="有问题尽管问我吧..."
+                            style="width: calc(100% - 40px); height: auto; border: none; margin-left: 40px; " 
+                            @oninput="OnInputChangedAsync" />
+
+            @if (_loading)
+            {
+                <!-- Cancel Button -->
+                <FluentButton style="position: absolute; right: 65px; bottom: 10px;"
+                              IconStart="@(new Icons.Regular.Size16.Dismiss())"
+                              Appearance="Appearance.Outline"
+                              OnClick="@CancelAsync">
+                </FluentButton>
+            }
+
+            <!-- SendQuestionAsync Button inside the input box on the right bottom corner -->
+            <FluentButton style="position: absolute; right: 15px; bottom: 10px;"
+                          IconStart="@(new Icons.Regular.Size16.Send())"
+                          Appearance="Appearance.Accent"
+                          Loading="@_loading"
+                          OnClick="@SendQuestionAsync">
+            </FluentButton>
+        </div>
+
+        
+    </div>
+</div>
+
+@code {
+    private Lazy<Task<IJSObjectReference>> moduleTask;
+    private IJSObjectReference _jsModule;
+
+    private bool _loading = false;
+
+    private int _rows = 2;
+
+    private string _inputMessage;
+
+    private string _currentStreamMessage;
+
+    private List<IntelligentAI.Records.Universal.Message> messages = new List<IntelligentAI.Records.Universal.Message>();
+
+    private CancellationTokenSource _cts = new CancellationTokenSource();
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // import code for highlighting code blocks
+            moduleTask = new(() => JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/scroll.js").AsTask());
+
+            _jsModule = await moduleTask.Value;
+        }
+
+        if (_loading)
+        {
+            await _jsModule.InvokeVoidAsync("scrollToBottom", "messageContainer");
+        }
+
+    }
+
+    private async Task SendQuestionAsync()
+    {
+        if (!string.IsNullOrWhiteSpace(_currentStreamMessage))
+        {
+            messages.Add(new IntelligentAI.Records.Universal.Message(Role: "assistant", Content: _currentStreamMessage));
+
+            _currentStreamMessage = string.Empty;
+
+            await _jsModule.InvokeVoidAsync("scrollToBottom", "messageContainer");
+        }
+
+        if (string.IsNullOrWhiteSpace(_inputMessage)) return;
+
+        var streamingContentBuilder = new System.Text.StringBuilder();
+
+        _cts = new CancellationTokenSource();
+
+        _loading = true; await InvokeAsync(StateHasChanged);
+
+        // 创建请求对象
+        var request = new AiArguments(_inputMessage, messages.ToArray());
+
+        messages.Add(new IntelligentAI.Records.Universal.Message(Role: "user", Content: _inputMessage));
+
+        _inputMessage = string.Empty;
+
+        await InvokeAsync(StateHasChanged);
+
+        try
+        {
+            await foreach (var message in ModelService.AnswerStringsAsync(request, cancellationToken: _cts.Token))
+            {
+                if (string.IsNullOrEmpty(message))
+                {
+                    streamingContentBuilder.AppendLine(message);
+                }
+                else
+                {
+                    streamingContentBuilder.Append(message);
+                }
+
+
+                _currentStreamMessage = streamingContentBuilder.ToString();
+
+                await InvokeAsync(StateHasChanged);
+            }
+
+            await InvokeAsync(StateHasChanged);
+        }
+
+        catch (Exception ex)
+        {
+            var message = $"Answer failed. Exception message: {ex.Message}";
+
+            ToastService.ShowToast(ToastIntent.Error, message);
+        }
+
+        _loading = false; await InvokeAsync(StateHasChanged);
+
+    }
+
+    private string GetAvatarUrl(string role)
+    {
+        return role switch
+        {
+            "assistant" => "avatars/assistant.jpg",
+            "user" => "avatars/user.jpg",
+            _ => "avatars/default.jpg"
+        };
+    }
+
+    private string GetAvatarStyle(string role)
+    {
+        return role switch
+        {
+            "assistant" => "avatar assistant",
+            "user" => "avatar user",
+            _ => "avatar system"
+        };
+    }
+
+    private async Task CancelAsync()
+    {
+        await _cts.CancelAsync();
+
+        _loading = false; await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task ClearAsync()
+    {
+        if (_loading)
+        {
+            await CancelAsync();
+        }
+
+        messages = new List<IntelligentAI.Records.Universal.Message>();
+
+        _currentStreamMessage = string.Empty;
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task OnInputChangedAsync(ChangeEventArgs e)
+    {
+        _inputMessage = e.Value?.ToString() ?? string.Empty;
+
+        _rows = Math.Max(_inputMessage.Split('\n').Length, _inputMessage.Split('\r').Length);
+        _rows = Math.Max(_rows, 2);
+        _rows = Math.Min(_rows, 10);
+
+        await InvokeAsync(StateHasChanged);
+
+    }
+}

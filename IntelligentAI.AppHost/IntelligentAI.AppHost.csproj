@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsAspireHost>true</IsAspireHost>
+    <UserSecretsId>d2aca0b2-9e0a-40b5-81a0-4ce9b50683d7</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\IntelligentAI.ApiService\IntelligentAI.ApiService.csproj" />
+    <ProjectReference Include="..\IntelligentAI.Web\IntelligentAI.Web.csproj" />
+    <ProjectReference Include="..\IntelligentAI.ClientStub\IntelligentAI.ClientStub.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Aspire.Hosting.AppHost" Version="8.0.1" />
+    <PackageReference Include="AspireMobile.Hosting" Version="0.7.130-beta" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,16 @@
+﻿@using Markdig
+@inherits FluentComponentBase
+
+
+<FluentCard MinimalStyle="true" Style="width: 100%; height:auto;" hidden="@string.IsNullOrWhiteSpace(@Content)">
+    @if (!DisplayMode)
+    {
+        <div>
+            @HtmlContent
+        </div>
+    }
+    else
+    {
+        <p>@Content</p>
+    }
+</FluentCard>

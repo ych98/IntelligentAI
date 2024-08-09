@@ -1,0 +1,64 @@
+﻿@page "/events"
+@using IntelligentAI.Models.Search
+
+@inject IToastService ToastService
+@inject IAiModelService ModelService
+
+<PageTitle>Events</PageTitle>
+
+<h1>Events</h1>
+
+
+<MarkdownSection Content="@_codeSnippet" />
+
+<p></p>
+
+<IntelligentAI.Components.Pages.Events />
+
+
+<FluentToastProvider />
+
+@code {
+
+    private string _codeSnippet = @"# 事件脉络检索模式
+
+## Base Mode
+
+1. **Input => Vector**
+
+   用户输入 => 语义搜索 => 脉络列表
+
+2. **Input => CoreWords => Topic**
+
+   用户输入 => 大模型提取核心词 => 智能搜索 => 脉络列表
+
+3. **Input => Vector + CoreWords**
+
+   用户输入 => 语义搜索 => 脉络列表 => 列表第一篇文章提取核心词 => 过滤后的脉络列表
+
+4. **Input => CoreWords => Topic + Vector**
+
+   用户输入 => 大模型提取核心词 => 智能搜索 => 脉络列表 => 列表第一篇文章提取摘要 => 语义搜索 => 新的脉络列表
+
+5. **(*) Input => Vector + MainWords**
+
+   用户输入 => 语义搜索 => 大模型提取主体词 => 过滤后的脉络列表
+
+6. **(*) Input => MainWords => Topic**
+
+   用户输入 => 大模型提取主体词 => 智能搜索 => 脉络列表
+
+*PS: * 表示暂时未实现的功能*
+
+## Auto Mode
+
+- **Input => CoreWords Count > 5 => Base Mode 1**
+
+  用户输入 => 大模型提取核心词 数量大于 5 => 基础模式 1
+
+- **Input => CoreWords Count <= 5 => Base Mode 2**
+
+  用户输入 => 大模型提取核心词 数量小于等于 5 => 基础模式 2
+";
+
+}

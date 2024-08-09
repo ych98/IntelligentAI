@@ -1,0 +1,156 @@
+﻿@inject IToastService ToastService
+@inject IAiModelService ModelService
+
+<EventSection OnEventsReceived="ReceiveEventsAsync" OnQuestionReceived="ReceiveQuestionAsync"
+              SelectedModel="12" />
+
+<p></p>
+<FluentLabel>Events:</FluentLabel>
+<FluentDataGrid Items="@_events" Style="width: 98%;">
+    <PropertyColumn Property="@(e => e.Id)" Sortable="true" />
+    <PropertyColumn Property="@(e => e.Date)" Format="yyyy-MM-dd" Sortable="true" />
+    <PropertyColumn Property="@(e => e.EventDate)" Sortable="true" Class="multiline-text" />
+    <PropertyColumn Property="@(e => e.Title)" Sortable="true" Class="multiline-text" />
+    <PropertyColumn Property="@(e => e.Summary)" Sortable="true" Class="multiline-text" />
+    <PropertyColumn Property="@(e => e.Abstraction)" Class="multiline-text" />
+    <PropertyColumn Property="@(e => e.SourceUrl)" Class="multiline-text" />
+    <PropertyColumn Property="@(e => e.Score)" Sortable="true" />
+</FluentDataGrid>
+
+@code {
+
+    private string _userQuestion;
+
+    private IQueryable<EventResult> _events;
+
+    private CancellationTokenSource _cts = new CancellationTokenSource();
+
+    #region 事件触发
+
+    private async Task ReceiveEventsAsync(IEnumerable<EventVenation> eventVenation)
+    {
+        _events = eventVenation.Select(e => new EventResult()
+            {
+                Id = e.Id,
+                Date = e.Date,
+                Title = e.Title,
+                SourceUrl = e.Url,
+                Score = e.Score
+            }).AsQueryable();
+
+        await InvokeAsync(StateHasChanged);
+
+        await RefreshEventsAsync();
+    }
+
+    private async Task ReceiveQuestionAsync(string question)
+    {
+        _userQuestion = question;
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task RefreshEventsAsync()
+    {
+        _cts = new CancellationTokenSource();
+
+        var events = _events.ToList();
+
+        var articleIds = events.Select(e => e.Id).ToArray();
+
+        var articles = await ModelService.GetArticlesByIdsAsync(articleIds, cancellationToken: _cts.Token);
+
+        #region 并发任务
+
+        List<AiArguments> tasks = new List<AiArguments>();
+
+        var eventPrompt = await ModelService.GetPromptAsync("prompt49", _cts.Token);
+
+        var eventTimePrompt = await ModelService.GetPromptAsync("prompt77", _cts.Token);
+
+        foreach (var e in events)
+        {
+            var article = articles.First(a => a.ArticleSequenceId == e.Id.ToString());
+
+            tasks.Add(new AiArguments(eventPrompt
+                .Replace("{正文}", article.Contenttxt)));
+
+            tasks.Add(new AiArguments(eventTimePrompt
+                .Replace("{提问}", _userQuestion)
+                .Replace("{正文}", article.Contenttxt)
+                .Replace("{发布日期}", article.Updatetime.ToString("yyyy年MM月dd日"))));
+        }
+
+        try
+        {
+            await foreach (var progress in ModelService.AnswerProgressAsync(tasks, 12, _cts.Token))
+            {
+                if (progress.IsException) continue;
+
+                // 偶数任务，取事件时间
+                if (progress.SortId % 2 == 0)
+                {
+                    string pattern = @"\d{4}年\d{2}月\d{2}日";
+
+                    System.Text.RegularExpressions.MatchCollection matches = System.Text.RegularExpressions.Regex.Matches(progress.Data, pattern);
+
+                    // 使用 HashSet 去重
+                    HashSet<string> uniqueDates = new HashSet<string>(matches.Select(m => m.Value));
+
+                    var eventDate = string.Join("\r\n", uniqueDates);
+
+                    events.ElementAt(progress.SortId / 2 - 1).EventDate = eventDate;
+                }
+                // 奇数任务，取脉络标题和概要
+                else
+                {
+                    string pattern = @"```json\s*([\s\S]*?)\s*```";
+
+                    System.Text.RegularExpressions.Match match = System.Text.RegularExpressions.Regex.Match(progress.Data, pattern);
+
+                    var singleEvent = System.Text.Json.JsonSerializer.Deserialize<EventResult>(!match.Success ? progress.Data : match.Groups[1].Value);
+
+                    events.ElementAt(progress.SortId / 2).Abstraction = singleEvent.Abstraction;
+
+                    events.ElementAt(progress.SortId / 2).Summary = singleEvent.Title;
+                }
+
+                _events = events.AsQueryable();
+
+                await InvokeAsync(StateHasChanged);
+            }
+
+        }
+        catch (OperationCanceledException e)
+        {
+            ToastService.ShowToast(ToastIntent.Info, e.Message);
+
+            await InvokeAsync(StateHasChanged);
+
+            return;
+        }
+        catch (System.Text.Json.JsonException e)
+        {
+            ToastService.ShowToast(ToastIntent.Warning, $"Deserialize exception: {e.Message}");
+        }
+        catch (Exception e)
+        {
+            ToastService.ShowToast(ToastIntent.Error, e.Message);
+
+            await InvokeAsync(StateHasChanged);
+
+            return;
+        }
+
+        #endregion
+    }
+
+    #endregion
+
+    public void Dispose()
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
+    }
+
+}

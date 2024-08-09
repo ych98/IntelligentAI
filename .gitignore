@@ -1,0 +1,34 @@
+# Visual Studio
+.vscode/
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+# ASP.NET Core
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# .NET Core
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# .NET, .NET Core, ASP.NET, ASP.NET Core
+bin/
+obj/
+*.Development.json
+*-nlog.txt
+*.tar
+
+# MAUI
+**/bin/
+**/obj/
+**/platforms/
+**.pfx
+
