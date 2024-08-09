@@ -14,28 +14,43 @@ namespace IntelligentAI.Client
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()
-            .UseMauiCommunityToolkit()
+                .UseMauiCommunityToolkit()
                 .ConfigureFonts(fonts =>
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                     fonts.AddFont("SegoeUI-Regular.ttf", "Segoe UI");
                 });
 
+#if DEBUG
+            builder.Configuration.AddInMemoryCollection(AspireAppSettings.Settings);
+#endif
+
             builder.AddAppDefaults();
 
             builder.Services.AddFluentUIComponents();
 
             builder.Services.AddMauiBlazorWebView();
-#if DEBUG
-            builder.Configuration.AddInMemoryCollection(AspireAppSettings.Settings);
-#endif
 
 #if DEBUG
             builder.Services.AddBlazorWebViewDeveloperTools();
     		builder.Logging.AddDebug();
 #endif
 
-            builder.Services.AddAiService(new AiOptions("https+http://apiservice"));
+            builder.Configuration.AddInMemoryCollection(AppSettings.Settings);
+
+            foreach (KeyValuePair<string, string> setting in AppSettings.Settings)
+            {
+                if (setting.Key.StartsWith("INTELLIGENTAI"))
+                {
+                    Environment.SetEnvironmentVariable(setting.Key, setting.Value);
+                }
+            }
+
+            var apiservice = builder.Configuration["INTELLIGENTAI_APISERVICE"] ?? "https+http://apiservice";
+
+            builder.Services.AddAiService(new AiOptions(apiservice));
+
+            // builder.Services.AddAiService(new AiOptions("https+http://apiservice"));
 
             builder.Services.AddSingleton<MainPage>();
 

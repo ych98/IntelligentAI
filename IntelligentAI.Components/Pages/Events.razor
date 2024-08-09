@@ -6,7 +6,7 @@
 
 <p></p>
 <FluentLabel>Events:</FluentLabel>
-<FluentDataGrid Items="@_events" Style="width: 98%;">
+<FluentDataGrid Items="@_events" Style="width: 100%; min-height: 200px;">
     <PropertyColumn Property="@(e => e.Id)" Sortable="true" />
     <PropertyColumn Property="@(e => e.Date)" Format="yyyy-MM-dd" Sortable="true" />
     <PropertyColumn Property="@(e => e.EventDate)" Sortable="true" Class="multiline-text" />

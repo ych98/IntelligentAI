@@ -31,4 +31,9 @@ obj/
 **/obj/
 **/platforms/
 **.pfx
+*.g.cs
 
+# Github Desktop
+.github
+
+*.cr

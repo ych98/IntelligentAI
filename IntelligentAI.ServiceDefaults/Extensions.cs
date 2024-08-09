@@ -2,10 +2,15 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Http.Resilience;
 using Microsoft.Extensions.Logging;
 using OpenTelemetry;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
+using Polly;
+
+using NLog.Extensions.Logging;
+using System.Net;
 
 namespace Microsoft.Extensions.Hosting;
 
@@ -25,11 +30,46 @@ public static class Extensions
         builder.Services.ConfigureHttpClientDefaults(http =>
         {
             // Turn on resilience by default
-            http.AddStandardResilienceHandler();
+            http.AddResilienceHandler(
+                "CustomPipeline",
+                static builder =>
+                {
+                    // See: https://www.pollydocs.org/strategies/retry.html
+                    builder.AddRetry(new HttpRetryStrategyOptions
+                    {
+                        // Customize and configure the retry logic.
+                        BackoffType = DelayBackoffType.Exponential,
+                        MaxRetryAttempts = 3,
+                        UseJitter = true
+                    });
+
+                    // See: https://www.pollydocs.org/strategies/circuit-breaker.html
+                    builder.AddCircuitBreaker(new HttpCircuitBreakerStrategyOptions
+                    {
+                        // Customize and configure the circuit breaker logic.
+                        SamplingDuration = TimeSpan.FromSeconds(60 * 10),
+                        FailureRatio = 0.2,
+                        MinimumThroughput = 3,
+                        ShouldHandle = static args =>
+                        {
+                            return ValueTask.FromResult(args is
+                            {
+                                Outcome.Result.StatusCode: HttpStatusCode.RequestTimeout or HttpStatusCode.TooManyRequests
+                            });
+                        }
+                    });
+
+                    // See: https://www.pollydocs.org/strategies/timeout.html
+                    builder.AddTimeout(TimeSpan.FromSeconds(60 * 3));
+                });
 
             // Turn on service discovery by default
             http.AddServiceDiscovery();
         });
+
+        builder.AddLog();
+
+        builder.Services.AddMemoryCache();
 
         return builder;
     }
@@ -107,5 +147,14 @@ public static class Extensions
         }
 
         return app;
+    }
+
+    public static IHostApplicationBuilder AddLog(this IHostApplicationBuilder builder)
+    {
+        builder.Logging.AddSimpleConsole(options => options.TimestampFormat = "yyyy-MM-dd HH:mm:ss ");
+        string environment = builder.Environment.EnvironmentName;
+        builder.Logging.AddNLog(File.Exists($"NLog.{environment}.config") ? $"NLog.{environment}.config" : $"NLog.config");
+
+        return builder;
     }
 }
