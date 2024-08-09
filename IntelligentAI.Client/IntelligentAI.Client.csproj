@@ -25,7 +25,7 @@
         <ApplicationTitle>IntelligentAI</ApplicationTitle>
 
         <!-- App Identifier -->
-        <ApplicationId>com.hzfanews.intelligence.apk</ApplicationId>
+        <ApplicationId>com.haessen.intelligence.maui</ApplicationId>
 
         <!-- Versions -->
         <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
