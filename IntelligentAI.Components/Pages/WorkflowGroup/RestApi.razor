@@ -1,0 +1,28 @@
+﻿
+
+@using IntelligentAI.Components.Universal
+
+<h4>Display</h4>
+
+<MarkdownSection Content="@Input"></MarkdownSection>
+
+<br/>
+
+<h4>Input</h4>
+
+<FluentTextArea @oninput="OnInputChanged" Rows="10" Value="@Input" Resize="TextAreaResize.Vertical" Placeholder="请输入内容..." style="width: 100%; height: 100%; border: none; margin-right: 50px;" />
+
+@code {
+    [Parameter]
+    public string? Input { get; set; }
+
+    private async Task DisplayAsync()
+    {
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private void OnInputChanged(ChangeEventArgs e)
+    {
+        Input = e.Value?.ToString() ?? string.Empty;
+    }
+}

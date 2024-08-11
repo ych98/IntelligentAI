@@ -1,0 +1,33 @@
+﻿@page "/workflow/drag-and-drop"
+
+<div class="row h-100">
+    <div class="col-4">
+        @* Toolbox *@
+        <div class="row h-100 p-4 no-gutters">
+            <div class="col-6">
+                <div class="text-center" draggable="true" @ondragstart="() => OnDragStart(0)">
+                    <div style="pointer-events:none;">
+                        <FluentPersona Image="avatars/user.jpg"
+                                       ImageSize="32px" />
+                        <span>Default Node</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="text-center" draggable="true" @ondragstart="() => OnDragStart(1)">
+                    <div style="pointer-events:none;">
+                        <FluentPersona Image="avatars/assistant.jpg"
+                                       ImageSize="32px" />
+
+                        <span>Bot Answer Node</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-8 diagram-container" ondragover="event.preventDefault();" @ondragover:preventDefault @ondrop="OnDrop">
+        <CascadingValue Value="_blazorDiagram">
+            <DiagramCanvas></DiagramCanvas>
+        </CascadingValue>
+    </div>
+</div>

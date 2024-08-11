@@ -42,7 +42,7 @@ else
 
         using (HttpClient client = _httpClientFactory.CreateClient(ServerName))
         {
-            await foreach (var forecast in client.GetFromJsonAsAsyncEnumerable<WeatherForecast>("/weatherforecast"))
+            await foreach (var forecast in client.GetFromJsonAsAsyncEnumerable<WeatherForecast>("/WeatherForecast/Get"))
             {
                 if (forecasts?.Count >= 10) break;
 

@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.FluentUI.AspNetCore.Components;
 using Microsoft.JSInterop;
 
-namespace IntelligentAI.Components.Universal;
+namespace IntelligentAI.Components.Universal.DisplayGroup;
 
 public partial class MarkdownSection : FluentComponentBase
 {
@@ -52,7 +52,7 @@ public partial class MarkdownSection : FluentComponentBase
         {
             // import code for highlighting code blocks
             moduleTask = new(() => JsRuntime.InvokeAsync<IJSObjectReference>(
-                "import", "./_content/IntelligentAI.Components/Universal/MarkdownSection.razor.js").AsTask());
+                "import", "./_content/IntelligentAI.Components/Universal/DisplayGroup/MarkdownSection.razor.js").AsTask());
 
             _jsModule = await moduleTask.Value;
         }

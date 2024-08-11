@@ -1,3 +1,0 @@
-
-namespace IntelligentAI.Client.DataGrids;
-

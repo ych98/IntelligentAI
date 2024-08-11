@@ -95,6 +95,7 @@
         <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.9.0" />
         <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.9.0" />
         <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="1.9.0" />
+        <PackageReference Include="Z.Blazor.Diagrams" Version="3.0.2" />
     </ItemGroup>
 
     <ItemGroup>
@@ -113,6 +114,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Folder Include="Components\Pages\ChatGroup\" />
       <Folder Include="Properties\PublishProfiles\" />
     </ItemGroup>
 

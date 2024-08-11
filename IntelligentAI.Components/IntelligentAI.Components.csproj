@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Universal\MarkdownSection.razor.js" />
+    <Content Include="Universal\DisplayGroup\MarkdownSection.razor.js" />
   </ItemGroup>
 
 
@@ -25,6 +25,7 @@
     <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components" Version="4.9.3" />
     <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components.Emoji" Version="4.6.0" />
     <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components.Icons" Version="4.9.3" />
+    <PackageReference Include="Z.Blazor.Diagrams" Version="3.0.2" />
   </ItemGroup>
 
   <ItemGroup>
@@ -32,7 +33,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Update="Pages\Events.razor">
+    <Content Update="Pages\EventGroup\Events.razor">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
     </Content>
     <Content Update="wwwroot\avatars\assistant.jpg">
@@ -47,6 +48,10 @@
     <Content Update="wwwroot\js\highlight-extensions.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Pages\ChatGroup\" />
   </ItemGroup>
 
 </Project>

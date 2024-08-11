@@ -2,7 +2,7 @@
 // Copyright (c) Microsoft Corporation.  All rights reserved.
 // --------------------------------------------------------------
 
-namespace IntelligentAI.Components.Universal;
+namespace IntelligentAI.Components.Universal.DisplayGroup;
 
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
@@ -33,7 +33,7 @@ public partial class CodeSnippet
 
             await JSRuntime.InvokeVoidAsync("hljs.highlightElement", codeElement);
             _jsModule = await JSRuntime.InvokeAsync<IJSObjectReference>("import",
-                "./_content/IntelligentAI.Components/Universal/CodeSnippet.razor.js");
+                "./_content/IntelligentAI.Components/Universal/DisplayGroup/CodeSnippet.razor.js");
             await _jsModule.InvokeVoidAsync("addCopyButton");
         }
     }

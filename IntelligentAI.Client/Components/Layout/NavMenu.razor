@@ -4,18 +4,39 @@
         <FluentIcon Value="@(new Icons.Regular.Size20.Navigation())" Color="Color.Fill" />
     </label>
     <nav class="sitenav" aria-labelledby="main-menu" onclick="document.getElementById('navmenu-toggle').click();">
-        <FluentNavMenu Id="main-menu" Collapsible="true" Width="250" Title="Navigation menu" @bind-Expanded="expanded">
+        <FluentNavMenu Id="main-menu" Collapsible="true" Width="250" Title="Navigation menu" @bind-Expanded=expanded>
             <FluentNavLink Href="/" Match="NavLinkMatch.All" Icon="@(new Icons.Regular.Size20.Home())" IconColor="Color.Accent">Home</FluentNavLink>
             <FluentNavLink Href="counter" Icon="@(new Icons.Regular.Size20.NumberSymbolSquare())" IconColor="Color.Accent">Counter</FluentNavLink>
             <FluentNavLink Href="weather" Icon="@(new Icons.Regular.Size20.WeatherPartlyCloudyDay())" IconColor="Color.Accent">Weather</FluentNavLink>
             <FluentNavLink Href="markdown" Icon="@(new Icons.Regular.Size20.Markdown())" IconColor="Color.Accent">Markdown</FluentNavLink>
-            <FluentNavLink Href="chat" Icon="@(new Icons.Regular.Size20.Chat())" IconColor="Color.Accent">Chat</FluentNavLink>
-            <FluentNavLink Href="events" Icon="@(new Icons.Regular.Size20.Feed())" IconColor="Color.Accent">Events</FluentNavLink>
-            @*<FluentNavLink Href="interlocution" Icon="@(new Icons.Regular.Size20.SlideText())" IconColor="Color.Accent">Interlocution</FluentNavLink>*@
+            <FluentNavGroup Id="ChatGroup" Title="Chat Bot" @bind-Expanded=chatExpanded Icon="@(new Icons.Regular.Size24.Chat())">
+                @*<FluentNavLink Href="interlocution" Icon="@(new Icons.Regular.Size20.SlideText())" IconColor="Color.Accent">Interlocution</FluentNavLink>*@
+                <FluentNavLink Href="chat" Icon="@(new Icons.Regular.Size20.EarthLeaf())" IconColor="Color.Accent">Universal</FluentNavLink>
+            </FluentNavGroup>
+            <FluentNavGroup Id="EventGroup" Title="Event Venation" @bind-Expanded=eventExpanded Icon="@(new Icons.Regular.Size24.Feed())">
+                <FluentNavLink Href="events" Icon="@(new Icons.Regular.Size20.Feed())" IconColor="Color.Accent">Events</FluentNavLink>
+                <FluentNavLink Href="prompts" Icon="@(new Icons.Regular.Size20.Feed())" IconColor="Color.Accent">Prompts</FluentNavLink>
+            </FluentNavGroup>
+            <FluentNavGroup Id="WorkflowGroup" Title="Workflow" @bind-Expanded=workflowExpanded Icon="@(new Icons.Regular.Size24.Feed())">
+                <FluentNavLink Href="workflow/diagram" Icon="@(new Icons.Regular.Size20.Feed())" IconColor="Color.Accent">Diagram</FluentNavLink>
+                <FluentNavLink Href="workflow/drag-and-drop" Icon="@(new Icons.Regular.Size20.Feed())" IconColor="Color.Accent">Drag</FluentNavLink>
+            </FluentNavGroup>
+            <FluentNavGroup Id="StockGroup" Title="Stock" @bind-Expanded=stockExpanded Icon="@(new Icons.Regular.Size24.Feed())">
+                <FluentNavLink Href="events" Icon="@(new Icons.Regular.Size20.Feed())" IconColor="Color.Accent">Events</FluentNavLink>
+            </FluentNavGroup>
+
        </FluentNavMenu>
     </nav>
 </div>
 
 @code {
-    private bool expanded = false;
+    bool expanded = true;
+
+    bool chatExpanded = true;
+
+    bool eventExpanded = true;
+
+    bool workflowExpanded = true;
+
+    bool stockExpanded = true;
 }
