@@ -92,7 +92,7 @@
                 // 偶数任务，取事件时间
                 if (progress.SortId % 2 == 0)
                 {
-                    string pattern = @"\d{4}年\d{2}月\d{2}日";
+                    string pattern = @"\d{4}年\d{1,2}月\d{1,2}日";
 
                     System.Text.RegularExpressions.MatchCollection matches = System.Text.RegularExpressions.Regex.Matches(progress.Data, pattern);
 

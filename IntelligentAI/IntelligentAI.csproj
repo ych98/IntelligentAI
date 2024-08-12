@@ -9,9 +9,9 @@
 	<Description>智能问答业务封装</Description>
 	<Platforms>AnyCPU;x86;x64</Platforms>
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
-	<PackageVersion>0.0.4</PackageVersion>
+	<PackageVersion>0.0.5</PackageVersion>
 	<PackageReleaseNotes>
-	  - 去除 SDK 中和大模型无关的接口方法
+	  - 调整阿里云模型调用方法，可传入 Role 为 System 的消息
 	</PackageReleaseNotes>
   </PropertyGroup>
 
@@ -21,10 +21,6 @@
 	
   <ItemGroup>
     <None Include="README.md" Pack="true" PackagePath="\" />
-  </ItemGroup>
-	
-  <ItemGroup>
-    <Folder Include="Aggregates\WorkflowComponents\" />
   </ItemGroup>
 
 </Project>
