@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace IntelligentAI.Components.Pages.EventGroup;
+namespace IntelligentAI.Components.Pages.FanewsGroup;
 
 public class EventResult
 {

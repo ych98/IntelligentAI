@@ -25,7 +25,7 @@
         <ApplicationTitle>IntelligentAI</ApplicationTitle>
 
         <!-- App Identifier -->
-        <ApplicationId>com.haessen.intelligence.maui</ApplicationId>
+        <ApplicationId>com.haessen.intelligent.ai</ApplicationId>
 
         <!-- Versions -->
         <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
@@ -99,7 +99,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Content Update="Components\Pages\Events.razor">
+      <Content Update="Components\Pages\FanewsGroup\Events.razor">
         <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       </Content>
       <Content Update="wwwroot\avatars\assistant.jpg">
@@ -114,7 +114,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Components\Pages\ChatGroup\" />
       <Folder Include="Properties\PublishProfiles\" />
     </ItemGroup>
 

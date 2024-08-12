@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Maui;
+using IntelligentAI.Enumerations;
 using IntelligentAI.Sdk;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -24,6 +25,7 @@ namespace IntelligentAI.Client
 
 #if DEBUG
             builder.Configuration.AddInMemoryCollection(AspireAppSettings.Settings);
+            builder.Configuration.AddInMemoryCollection(AppSettings.Settings);
 #endif
 
             builder.AddAppDefaults();
@@ -36,22 +38,6 @@ namespace IntelligentAI.Client
             builder.Services.AddBlazorWebViewDeveloperTools();
     		builder.Logging.AddDebug();
 #endif
-
-            builder.Configuration.AddInMemoryCollection(AppSettings.Settings);
-
-            foreach (KeyValuePair<string, string> setting in AppSettings.Settings)
-            {
-                if (setting.Key.StartsWith("INTELLIGENTAI"))
-                {
-                    Environment.SetEnvironmentVariable(setting.Key, setting.Value);
-                }
-            }
-
-            var apiservice = builder.Configuration["INTELLIGENTAI_APISERVICE"] ?? "https+http://apiservice";
-
-            builder.Services.AddAiService(new AiOptions(apiservice));
-
-            // builder.Services.AddAiService(new AiOptions("https+http://apiservice"));
 
             builder.Services.AddSingleton<MainPage>();
 

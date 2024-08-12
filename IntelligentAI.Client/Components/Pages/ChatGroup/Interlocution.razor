@@ -1,0 +1,28 @@
+﻿@page "/chat/interlocution"
+
+@using IntelligentAI.Components.Universal.FanewsGroup
+@using IntelligentAI.Components.Universal.DisplayGroup
+
+<PageTitle>Interlocution</PageTitle>
+
+<h1>Interlocution</h1>
+
+<AnswerSection OnAnswerReceived="RefreshAnswerAsync" />
+
+<FluentSwitch @bind-Value="@_displayMode" CheckedMessage="Text" UncheckedMessage="Markdown">DisplayMode:</FluentSwitch>
+
+<MarkdownSection DisplayMode="@_displayMode" Content="@_botAnswer" />
+
+<FluentToastProvider />
+
+@code {
+    private bool _displayMode = false;
+
+    private string _botAnswer;
+
+    private async Task RefreshAnswerAsync(string answer)
+    {
+        _botAnswer = answer;
+        await InvokeAsync(StateHasChanged);
+    }
+}

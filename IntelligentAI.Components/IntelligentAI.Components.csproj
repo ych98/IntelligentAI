@@ -33,7 +33,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Update="Pages\EventGroup\Events.razor">
+    <Content Update="Pages\FanewsGroup\Events.razor">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
     </Content>
     <Content Update="wwwroot\avatars\assistant.jpg">
@@ -48,10 +48,6 @@
     <Content Update="wwwroot\js\highlight-extensions.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Pages\ChatGroup\" />
   </ItemGroup>
 
 </Project>

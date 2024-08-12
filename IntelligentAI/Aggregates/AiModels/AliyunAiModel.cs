@@ -22,6 +22,8 @@ public class AliyunAiModel : AiModelBase
 
         string promptContent = string.Empty;
 
+        string systemContent = string.Empty;
+
         #region 参数校验
 
         if (string.IsNullOrWhiteSpace(question)) throw new ArgumentNullException($"提问内容不能为空，请确保 question 参数的有效性");
@@ -53,6 +55,10 @@ public class AliyunAiModel : AiModelBase
                         : prompt == PromptEnum.Null
                             ? string.Empty
                             : prompt.Description;
+
+                    systemContent = prompt == PromptEnum.System
+                       ? (string)template
+                       : string.Empty;
                 }
                 else
                 {
@@ -68,9 +74,11 @@ public class AliyunAiModel : AiModelBase
         // 转换为大模型传入参数
         Dictionary<string, object> formatParameters = GetParameters(nameof(AnswerText), parameters);
 
-        var messageList = new List<Message>() 
-        { 
-            new Records.Universal.Message("system", "你是一名优秀的人工智能助手，擅长中文和英文的对话。你会为用户提供安全，有帮助，准确的回答。") 
+        var messageList = new List<Message>()
+        {
+            new Records.Universal.Message("system", string.IsNullOrWhiteSpace(systemContent)
+                ? "你是一名优秀的人工智能助手，擅长中文和英文的对话。你会为用户提供安全，有帮助，准确的回答。"
+                : systemContent)
         };
 
         if (messages is not null && messages.Any())
@@ -102,6 +110,7 @@ public class AliyunAiModel : AiModelBase
         [EnumeratorCancellation] CancellationToken cancellation = default)
     {
         string promptContent = string.Empty;
+        string systemContent = string.Empty;
 
         #region 参数校验
 
@@ -134,6 +143,10 @@ public class AliyunAiModel : AiModelBase
                         : prompt == PromptEnum.Null
                             ? string.Empty
                             : prompt.Description;
+                    systemContent = prompt == PromptEnum.System
+                       ? (string)template
+                       : string.Empty;
+
                 }
                 else
                 {
@@ -151,7 +164,9 @@ public class AliyunAiModel : AiModelBase
 
         var messageList = new List<Message>()
         {
-            new Records.Universal.Message("system", "你是一名优秀的人工智能助手，擅长中文和英文的对话。你会为用户提供安全，有帮助，准确的回答。")
+            new Records.Universal.Message("system", string.IsNullOrWhiteSpace(systemContent)
+                ? "你是一名优秀的人工智能助手，擅长中文和英文的对话。你会为用户提供安全，有帮助，准确的回答。"
+                : systemContent)
         };
 
         if (messages is not null && messages.Any())

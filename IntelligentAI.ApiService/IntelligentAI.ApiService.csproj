@@ -4,10 +4,17 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AspectInjector" Version="2.8.2" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.7.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\IntelligentAI.ServiceDefaults\IntelligentAI.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\IntelligentAI\IntelligentAI.csproj" />
   </ItemGroup>
 
 </Project>

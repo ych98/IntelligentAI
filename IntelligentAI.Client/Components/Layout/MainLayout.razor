@@ -1,12 +1,17 @@
-﻿@inherits LayoutComponentBase
-
-<FluentDesignTheme Mode="DesignThemeModes.Light" OfficeColor="Microsoft.FluentUI.AspNetCore.Components.OfficeColor.OneNote" StorageName="theme" />
+﻿
+@inherits LayoutComponentBase
 
 <FluentLayout>
     <FluentHeader>
-        Intelligent          
+        IntelligentAI     
         <FluentSpacer />
-        Aligned to the end
+            <div class="links">
+                <FluentAnchor Appearance="Appearance.Hypertext"
+                          Href="https://github.com/ych98/IntelligentAI" Target="_blank" Rel="noreferrer noopener"
+                          title="IntelligentAI library source on GitHub" aria-label="IntelligentAI library source on GitHub">
+                <FluentIcon Value="@(new GitHubIcon())" Color="Color.FillInverse" />
+                </FluentAnchor>
+            </div>
     </FluentHeader>
     <FluentStack Class="main" Orientation="Microsoft.FluentUI.AspNetCore.Components.Orientation.Horizontal" Width="100%">
         <NavMenu />
@@ -15,12 +20,11 @@
                 @Body
             </div>
         </FluentBodyContent>
+        <FluentToastProvider MaxToastCount="10" />
+        <FluentDialogProvider />
+        <FluentTooltipProvider />
+        <FluentMessageBarProvider />
     </FluentStack>
-
-    <FluentToastProvider />
-    <FluentDialogProvider />
-    <FluentTooltipProvider />
-    <FluentMessageBarProvider />
 </FluentLayout>
 
 <div id="blazor-error-ui">
@@ -35,3 +39,5 @@
 
     public OfficeColor? OfficeColor { get; set; }
 }
+
+   

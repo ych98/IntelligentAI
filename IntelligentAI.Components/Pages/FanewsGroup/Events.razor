@@ -1,4 +1,6 @@
-﻿@inject IToastService ToastService
+﻿@using IntelligentAI.Components.Universal.FanewsGroup
+
+@inject IToastService ToastService
 @inject IAiModelService ModelService
 
 <EventSection OnEventsReceived="ReceiveEventsAsync" OnQuestionReceived="ReceiveQuestionAsync"

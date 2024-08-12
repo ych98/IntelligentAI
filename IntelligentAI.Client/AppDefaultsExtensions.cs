@@ -7,6 +7,8 @@ using OpenTelemetry.Trace;
 using Polly;
 using System.Net;
 using NLog.Extensions.Logging;
+using IntelligentAI.Enumerations;
+using IntelligentAI.Sdk;
 
 namespace Microsoft.Extensions.Hosting;
 
@@ -61,6 +63,8 @@ public static class AppDefaultsExtensions
         });
 
         builder.AddLog();
+
+        builder.AddAiService();
 
         return builder;
     }
@@ -124,6 +128,28 @@ public static class AppDefaultsExtensions
         return builder;
     }
 
+    
+
+    public static MauiAppBuilder AddLog(this MauiAppBuilder builder)
+    {
+        builder.Logging.AddSimpleConsole(options => options.TimestampFormat = "yyyy-MM-dd HH:mm:ss ");
+
+        builder.Logging.AddNLog("NLog.config");
+
+        return builder;
+    }
+
+    public static MauiAppBuilder AddAiService(this MauiAppBuilder builder)
+    {
+        SetIntelligentEnvironmentVariables();
+
+        var apiservice = builder.Configuration["INTELLIGENTAI_APISERVICE"] ?? "https+http://apiservice";
+
+        builder.Services.AddAiService(new AiOptions(apiservice));
+
+        return builder;
+    }
+
     private static void SetOpenTelemetryEnvironmentVariables()
     {
         foreach (KeyValuePair<string, string> setting in AspireAppSettings.Settings)
@@ -135,15 +161,16 @@ public static class AppDefaultsExtensions
         }
     }
 
-    public static MauiAppBuilder AddLog(this MauiAppBuilder builder)
+    private static void SetIntelligentEnvironmentVariables()
     {
-        builder.Logging.AddSimpleConsole(options => options.TimestampFormat = "yyyy-MM-dd HH:mm:ss ");
-
-        builder.Logging.AddNLog("NLog.config");
-
-        return builder;
+        foreach (KeyValuePair<string, string> setting in AppSettings.Settings)
+        {
+            if (setting.Key.StartsWith("INTELLIGENTAI_"))
+            {
+                Environment.SetEnvironmentVariable(setting.Key, setting.Value);
+            }
+        }
     }
-
 
     private static MeterProviderBuilder AddAppMeters(this MeterProviderBuilder meterProviderBuilder) =>
         meterProviderBuilder.AddMeter(
