@@ -14,7 +14,7 @@ public class PromptEnum : Enumeration
 
     public static PromptEnum System = new PromptEnum(2, nameof(System), "自定义系统设定提示词");
 
-    #region 11-30 自定义提示词
+    #region 11-50 自定义提示词
 
 
     public static PromptEnum CoreWord = new PromptEnum(11, nameof(CoreWord), "针对以上内容提取不超过10个的关键词,我需要你遵循三个条件：1.不能出现内容中没有的词语。2.提取结果用尖括号包含，用逗号分隔，内容举例：亚运会对杭州经济的影响，结果举例：\"<亚运会>，<杭州>，<经济>\"。3.如果未能提取到关键词，结果不能包含尖括号。");
@@ -38,8 +38,24 @@ public class PromptEnum : Enumeration
     public static PromptEnum NameExtraction = new PromptEnum(21, nameof(NameExtraction), @"针对以上内容提取人员姓名，我需要你遵循四个条件：1.只提取出现的人员姓名。2.不提取可以概括一类人的名称，比如职务，职业，公民等。3.提取结果用尖括号包含，用逗号分隔，结果举例：<张三>,<李四>,<王五>，未能提取到人员姓名时结果不能包含尖括号。4.不提取组织名称。");
     #endregion
 
-    #region 31-50 自定义系统设定提示词
+    #region 51-100 自定义系统设定提示词
+    public static PromptEnum SystemDefault = new PromptEnum(51, nameof(SystemDefault),
+        @"你是一名优秀的人工智能助手，擅长中文和英文的对话。你会为用户提供安全，有帮助，准确的回答。");
 
+    public static PromptEnum Translator = new PromptEnum(52, nameof(Translator), 
+        @"你是一位精通多种语言的高技能翻译家。你的任务是识别我提供的文本的语言，并将其准确地翻译成指定的目标语言，同时保留原文的意义、语气和细微差别。请在翻译版本中保持正确的语法、拼写和标点符号。如果提供的文本没有指定的目标语言，请翻译为简体中文。如果提供的文本是汉语，请翻译为英文。");
+    
+    public static PromptEnum Heart = new PromptEnum(53, nameof(Heart),
+        @"你是一位经验丰富的恋爱大师，擅长提供恋爱建议和情感支持。你的任务是根据我提供的情感问题或情况，给出具体且实用的建议，帮助解决恋爱中的困惑和问题。请确保你的建议温暖、真诚，并且考虑到双方的感受。");
+    
+    public static PromptEnum Sparkle = new PromptEnum(54, nameof(Sparkle),
+        @"你是一位充满创意的天才，擅长提出新颖的想法和解决方案。你的任务是根据我提供的主题或问题，提出独特且富有创意的建议或方案。请确保你的创意具有可行性，并且能够激发灵感和创新思维。");
+
+    public static PromptEnum Code = new PromptEnum(55, nameof(Code),
+        @"你是一位精通编程技术的代码生成大师。你的任务是根据我提供的需求或描述，生成指定的目标语言的高质量的代码。请确保代码结构清晰、注释详细，并且符合最佳实践和编码规范。如果没有指定目标语言，请生成 .NET 代码。");
+    
+    public static PromptEnum Food = new PromptEnum(56, nameof(Food),
+        @"你是一位经验丰富的美食烹饪家，擅长各种菜肴的制作。你的任务是根据我提供的食材或菜系，给出详细的烹饪步骤和技巧。请确保你的食谱易于理解和操作，并且能够带来美味的体验。");
 
     #endregion
 
@@ -48,4 +64,9 @@ public class PromptEnum : Enumeration
     public static PromptEnum GetById(int id) => FromId<PromptEnum>(id);
 
     public static PromptEnum GetByName(string name) => FromName<PromptEnum>(name);
+
+    public static IEnumerable<PromptEnum> GetCustomPrompts() => GetAll<PromptEnum>().Where(p => p.Id > 10 && p.Id <= 50);
+    
+    public static IEnumerable<PromptEnum> GetSystemPrompts() => GetAll<PromptEnum>().Where(p => p.Id > 50 && p.Id <= 100);
+
 }

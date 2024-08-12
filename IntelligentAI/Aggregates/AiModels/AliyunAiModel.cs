@@ -52,7 +52,7 @@ public class AliyunAiModel : AiModelBase
                 {
                     promptContent = prompt == PromptEnum.Custom
                         ? (string)template
-                        : prompt == PromptEnum.Null
+                        : prompt == PromptEnum.Null || prompt == PromptEnum.System
                             ? string.Empty
                             : prompt.Description;
 
@@ -62,7 +62,7 @@ public class AliyunAiModel : AiModelBase
                 }
                 else
                 {
-                    promptContent = prompt == PromptEnum.Null
+                    promptContent = prompt == PromptEnum.Null || prompt == PromptEnum.System
                             ? string.Empty
                             : prompt.Description;
                 }
@@ -140,7 +140,7 @@ public class AliyunAiModel : AiModelBase
                 {
                     promptContent = prompt == PromptEnum.Custom
                         ? (string)template
-                        : prompt == PromptEnum.Null
+                        : prompt == PromptEnum.Null || prompt == PromptEnum.System
                             ? string.Empty
                             : prompt.Description;
                     systemContent = prompt == PromptEnum.System
@@ -150,7 +150,7 @@ public class AliyunAiModel : AiModelBase
                 }
                 else
                 {
-                    promptContent = prompt == PromptEnum.Null
+                    promptContent = prompt == PromptEnum.Null || prompt == PromptEnum.System
                             ? string.Empty
                             : prompt.Description;
                 }

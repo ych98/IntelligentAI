@@ -88,7 +88,7 @@
         var request = new AiArguments(
             UserQuestion,
             _selectedPrompt,
-            _selectedPrompt == PromptEnum.Custom.Name ? _prompt : string.Empty,
+            _selectedPrompt != PromptEnum.Null.Name ? _prompt : string.Empty,
             0.8,
             0.3
         );

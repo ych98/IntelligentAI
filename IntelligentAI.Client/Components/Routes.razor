@@ -5,4 +5,12 @@
     </Found>
 </Router>
 
-<FluentDesignTheme Mode="DesignThemeModes.Light" OfficeColor="Microsoft.FluentUI.AspNetCore.Components.OfficeColor.OneNote" StorageName="theme" />
+<FluentDesignTheme @bind-Mode=Mode OfficeColor="Microsoft.FluentUI.AspNetCore.Components.OfficeColor.OneNote" StorageName="theme" />
+
+@code
+{
+    public DesignThemeModes Mode { get; set; } = DesignThemeModes.Light;
+
+    public OfficeColor? OfficeColor { get; set; }
+}
+

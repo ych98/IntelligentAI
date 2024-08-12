@@ -7,7 +7,17 @@
 
 <div class="chat-container" >
 
-    <h1>Chat Room</h1>
+    <div class="header-container">
+        <h1 style="display: inline-block; margin-right: auto;">Chat Room</h1>
+        <div style="display: inline-block; float: right;">
+            <FluentSelect Items="@PromptOptions"
+                          Id="model-listbox"
+                          OptionValue="@(m => m.Value)"
+                          OptionText="@(m => m.Text)"
+                          OptionSelected="@(m => m.Selected)"
+                          @bind-Value="@_systemDefinition" />
+        </div>
+    </div>
 
     <div id="messageContainer" class="messages">
 
@@ -15,7 +25,7 @@
             <FluentPersona Class="@GetAvatarStyle("assistant")"
                            Image="@GetAvatarUrl("assistant")"
                            ImageSize="32px" />
-            <MarkdownSection Content="你好！我是小凡，你的专属智能助手，有问题尽管问我吧!" />
+            <MarkdownSection Content=" 你好！我是小凡，你的专属智能助手，有问题尽管问我吧!" />
         </div>
 
         @foreach (var message in messages)
@@ -85,6 +95,20 @@
 
     private int _rows = 2;
 
+    private string _systemDefinition = "智能助手";
+
+    public Enumerations.PromptEnum[] SystemPrompts => Enumerations.PromptEnum.GetAll<Enumerations.PromptEnum>().Where(m => m.Id > 50).ToArray();
+
+    public List<Option<string>> PromptOptions = new()
+    {
+        { new Option<string> { Value = "question", Text = "智能助手", Icon = (new Icons.Regular.Size16.ChatBubblesQuestion(), Color.Neutral, "start"  ), Selected = true } },
+        { new Option<string> { Value = "heart", Text = "恋爱大师", Icon = (new Icons.Regular.Size16.ChatMultipleHeart(), Color.Neutral, "start"  ) } },
+        { new Option<string> { Value = "sparkle", Text = "创意大师", Icon = (new Icons.Regular.Size16.ChatSparkle(), Color.Neutral, "start"  ) } },
+        { new Option<string> { Value = "code", Text = "编程专家", Icon = (new Icons.Regular.Size16.CodeBlock(), Color.Neutral, "start"  ) } },
+        { new Option<string> { Value = "food", Text = "美食烹饪家", Icon = (new Icons.Regular.Size16.Food(), Color.Neutral, "start"  ) } },
+        { new Option<string> { Value = "translate", Text = "翻译大师", Icon = (new Icons.Regular.Size16.Translate(), Color.Neutral, "start"  ) } }
+    };
+
     private string _inputMessage;
 
     private string _currentStreamMessage;
@@ -131,7 +155,11 @@
         _loading = true; await InvokeAsync(StateHasChanged);
 
         // 创建请求对象
-        var request = new AiArguments(_inputMessage, messages.ToArray());
+        var request = new AiArguments(
+            _inputMessage,
+            prompt: Enumerations.PromptEnum.System.Name,
+            GetSystemDefinition(_systemDefinition),
+            messages.ToArray());
 
         messages.Add(new IntelligentAI.Records.Universal.Message(Role: "user", Content: _inputMessage));
 
@@ -176,7 +204,7 @@
     {
         return role switch
         {
-            "assistant" => "avatars/assistant.jpg",
+            "assistant" => _systemDefinition != "heart" ? "avatars/assistant.jpg" : "avatars/default.jpg",
             "user" => "avatars/user.jpg",
             _ => "avatars/default.jpg"
         };
@@ -191,6 +219,21 @@
             _ => "avatar system"
         };
     }
+
+    private string GetSystemDefinition(string roleDefinition)
+    {
+        return roleDefinition switch
+        {
+            "question" => Enumerations.PromptEnum.SystemDefault.Description,
+            "heart" => Enumerations.PromptEnum.Heart.Description,
+            "sparkle" => Enumerations.PromptEnum.Sparkle.Description,
+            "code" => Enumerations.PromptEnum.Code.Description,
+            "food" => Enumerations.PromptEnum.Food.Description,
+            "translate" => Enumerations.PromptEnum.Translator.Description,
+            _ => Enumerations.PromptEnum.SystemDefault.Description
+        };
+    }
+
 
     private async Task CancelAsync()
     {
@@ -224,4 +267,6 @@
         await InvokeAsync(StateHasChanged);
 
     }
+
+
 }

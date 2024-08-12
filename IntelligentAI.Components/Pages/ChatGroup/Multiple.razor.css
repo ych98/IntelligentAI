@@ -5,12 +5,17 @@
     height: calc(100dvh - 66px); /* 设置容器高度为视口高度 */
 }
 
+.header-container {
+    display: flex; /* 使用Flex布局 */
+    justify-content: space-between; /* 标题和多选框两端对齐 */
+    align-items: center; /* 垂直居中对齐 */
+    padding: 10px; /* 添加一些内边距 */
+}
 .input-container {
     display: flex;
     align-items: center;
     padding: 5px;
     border-top: 1px solid #ccc;
-    padding-bottom: env(safe-area-inset-bottom);
 }
 
 .messages {

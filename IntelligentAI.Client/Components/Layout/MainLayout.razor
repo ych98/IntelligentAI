@@ -6,7 +6,7 @@
         IntelligentAI     
         <FluentSpacer />
             <div class="links">
-                <FluentAnchor Appearance="Appearance.Hypertext"
+                <FluentAnchor Appearance="Appearance.Hypertext" Style="margin-right: 32px;"
                           Href="https://github.com/ych98/IntelligentAI" Target="_blank" Rel="noreferrer noopener"
                           title="IntelligentAI library source on GitHub" aria-label="IntelligentAI library source on GitHub">
                 <FluentIcon Value="@(new GitHubIcon())" Color="Color.FillInverse" />
@@ -33,11 +33,3 @@
     <a class="dismiss">🗙</a>
 </div>
 
-@code
-{
-    public DesignThemeModes Mode { get; set; } = DesignThemeModes.Light;
-
-    public OfficeColor? OfficeColor { get; set; }
-}
-
-   
