@@ -17,8 +17,8 @@ public class Article
 
     public string Simhash { get; set; }
 
-    [JsonPropertyName("_score")]
-    public string Score { get; set; }
+    [JsonPropertyName("score")]
+    public double Score { get; set; }
 
     //
     // 摘要:
@@ -443,7 +443,7 @@ public class Article
 
     [JsonPropertyName("mediarank")]
 
-    public string MediaRank { get; set; }
+    public int MediaRank { get; set; }
 
     //
     // 摘要:
@@ -457,43 +457,43 @@ public class Article
     //
     // 摘要:
     //     人名
-    [JsonPropertyName("person.nr")]
+    [JsonPropertyName("person_nr")]
     public string Person_nr { get; set; }
 
     //
     // 摘要:
     //     地名
-    [JsonPropertyName("place.ns")]
+    [JsonPropertyName("place_ns")]
     public string Place_ns { get; set; }
 
     //
     // 摘要:
     //     组织名
-    [JsonPropertyName("org.nt")]
+    [JsonPropertyName("org_nt")]
     public string Org_nt { get; set; }
 
     //
     // 摘要:
     //     领导名
-    [JsonPropertyName("person.nrl")]
+    [JsonPropertyName("person_nrl")]
     public string Person_nrl { get; set; }
 
     //
     // 摘要:
     //     国家名
-    [JsonPropertyName("place.ns1")]
+    [JsonPropertyName("place_ns1")]
     public string Place_ns1 { get; set; }
 
     //
     // 摘要:
     //     省份
-    [JsonPropertyName("place.ns2")]
+    [JsonPropertyName("place_ns2")]
     public string Place_ns2 { get; set; }
 
     //
     // 摘要:
     //     城市
-    [JsonPropertyName("place.ns3")]
+    [JsonPropertyName("place_ns3")]
     public string Place_ns3 { get; set; }
 
     //

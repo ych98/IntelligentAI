@@ -92,7 +92,7 @@
                 // 偶数任务，取事件时间
                 if (progress.SortId % 2 == 0)
                 {
-                    string pattern = @"\d{4}年\d{1,2}月\d{1,2}日";
+                    string pattern = @"(\d{4}年\d{1,2}月\d{1,2}日)|(\d{4}年\d{1,2}月(下旬|初|中旬|上旬|底))|(\d{4}年\d{1,2}月)";
 
                     System.Text.RegularExpressions.MatchCollection matches = System.Text.RegularExpressions.Regex.Matches(progress.Data, pattern);
 
@@ -109,12 +109,19 @@
                     string pattern = @"```json\s*([\s\S]*?)\s*```";
 
                     System.Text.RegularExpressions.Match match = System.Text.RegularExpressions.Regex.Match(progress.Data, pattern);
+                    try
+                    {
+                        var singleEvent = System.Text.Json.JsonSerializer.Deserialize<EventResult>(!match.Success ? progress.Data : match.Groups[1].Value);
 
-                    var singleEvent = System.Text.Json.JsonSerializer.Deserialize<EventResult>(!match.Success ? progress.Data : match.Groups[1].Value);
+                        events.ElementAt(progress.SortId / 2).Abstraction = singleEvent.Abstraction;
 
-                    events.ElementAt(progress.SortId / 2).Abstraction = singleEvent.Abstraction;
+                        events.ElementAt(progress.SortId / 2).Summary = singleEvent.Title;
 
-                    events.ElementAt(progress.SortId / 2).Summary = singleEvent.Title;
+                    }
+                    catch (System.Text.Json.JsonException e)
+                    {
+                        ToastService.ShowToast(ToastIntent.Warning, $"Deserialize exception:{e.Message} \n\n{progress.Data}");
+                    }
                 }
 
                 _events = events.AsQueryable();
@@ -130,10 +137,6 @@
             await InvokeAsync(StateHasChanged);
 
             return;
-        }
-        catch (System.Text.Json.JsonException e)
-        {
-            ToastService.ShowToast(ToastIntent.Warning, $"Deserialize exception: {e.Message}");
         }
         catch (Exception e)
         {

@@ -25,8 +25,9 @@ namespace IntelligentAI.Client
 
 #if DEBUG
             builder.Configuration.AddInMemoryCollection(AspireAppSettings.Settings);
-            builder.Configuration.AddInMemoryCollection(AppSettings.Settings);
 #endif
+
+            builder.Configuration.AddInMemoryCollection(AppSettings.Settings);
 
             builder.AddAppDefaults();
 
