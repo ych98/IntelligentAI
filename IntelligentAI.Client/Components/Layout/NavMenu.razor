@@ -10,18 +10,14 @@
             <FluentNavLink Href="weather" Icon="@(new Icons.Regular.Size20.WeatherPartlyCloudyDay())" IconColor="Color.Accent">Weather</FluentNavLink>
             <FluentNavLink Href="markdown" Icon="@(new Icons.Regular.Size20.Markdown())" IconColor="Color.Accent">Markdown</FluentNavLink>        
             
-            <FluentNavGroup Id="FanewsGroup" Title="Fanews Business" @bind-Expanded=eventExpanded Icon="@(new Icons.Regular.Size20.Feed())">
-                <FluentNavLink Href="events" Icon="@(new Icons.Regular.Size20.Feed())" IconColor="Color.Accent">Events</FluentNavLink>
-                <FluentNavLink Href="prompts" Icon="@(new Icons.Regular.Size20.Feed())" IconColor="Color.Accent">Prompts</FluentNavLink>
+            <FluentNavGroup Id="FanewsGroup" Title="Fanews Business" @bind-Expanded=eventExpanded Icon="@(new Icons.Regular.Size20.FoodToast())">
+                <FluentNavLink Href="events" Icon="@(new Icons.Regular.Size20.ClockBill())" IconColor="Color.Accent">Events</FluentNavLink>
+                <FluentNavLink Href="prompts" Icon="@(new Icons.Regular.Size20.CommentNote())" IconColor="Color.Accent">Prompts</FluentNavLink>
             </FluentNavGroup>
 
             <FluentNavGroup Id="ChatGroup" Title="Chat Group" @bind-Expanded=chatExpanded Icon="@(new Icons.Regular.Size20.Chat())">
                 <FluentNavLink Href="chat/interlocution" Icon="@(new Icons.Regular.Size20.ChatEmpty())" IconColor="Color.Accent">Interlocution</FluentNavLink>
                 <FluentNavLink Href="chat/multiple" Icon="@(new Icons.Regular.Size20.ChatMultiple())" IconColor="Color.Accent">Multiple Chat</FluentNavLink>
-                <FluentNavLink Href="chat/question" Icon="@(new Icons.Regular.Size20.ChatBubblesQuestion())" IconColor="Color.Accent">Bubbles Question</FluentNavLink>
-                <FluentNavLink Href="chat/heart" Icon="@(new Icons.Regular.Size20.ChatMultipleHeart())" IconColor="Color.Accent">Heart Chat</FluentNavLink>
-                <FluentNavLink Href="chat/sparkle" Icon="@(new Icons.Regular.Size20.ChatSparkle())" IconColor="Color.Accent">Sparkle</FluentNavLink>
-                <FluentNavLink Href="chat/translate" Icon="@(new Icons.Regular.Size20.Translate())" IconColor="Color.Accent">Translate</FluentNavLink>
             </FluentNavGroup>
 
             <FluentNavGroup Id="WorkflowGroup" Title="Workflow" @bind-Expanded=workflowExpanded Icon="@(new Icons.Regular.Size20.Feed())">

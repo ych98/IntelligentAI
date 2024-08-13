@@ -36,13 +36,16 @@
             </div>
         }
 
-        <div class="message">
-            <FluentPersona Class="@GetAvatarStyle("assistant")"
-                           hidden="@string.IsNullOrWhiteSpace(_currentStreamMessage)"
-                           Image="@GetAvatarUrl("assistant")"
-                           ImageSize="32px" />
-            <MarkdownSection Content="@_currentStreamMessage" />
-        </div>
+        @if (!string.IsNullOrWhiteSpace(_currentStreamMessage))
+        {
+            <div class="message">
+                <FluentPersona Class="@GetAvatarStyle("assistant")"
+                               Image="@GetAvatarUrl("assistant")"
+                               ImageSize="32px" />
+                <MarkdownSection Content="@_currentStreamMessage" />
+            </div>
+        }
+       
     </div>
 
     <div class="input-container">
@@ -57,10 +60,11 @@
 
             <!-- Text Area -->
             <FluentTextArea id="textArea"
-                Rows="@_rows"
-                Value="@_inputMessage" 
-                Disabled="@(_loading)" 
-                Placeholder="有问题尽管问我吧..."
+                            @onkeydown="HandleKeyDown"
+                            Rows="@_rows"
+                            @bind-Value=_inputMessage
+                            Disabled="@(_loading)" 
+                            Placeholder="有问题尽管问我吧...使用 Shift + Enter 提交消息。"
                             style="width: calc(100% - 40px); height: auto; border: none; margin-left: 40px; " 
                             @oninput="OnInputChangedAsync" />
 
@@ -123,7 +127,7 @@
         if (firstRender)
         {
             // import code for highlighting code blocks
-            moduleTask = new(() => JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/scroll.js").AsTask());
+            moduleTask = new(() => JsRuntime.InvokeAsync<IJSObjectReference>("import", "./_content/IntelligentAI.Components/js/scroll.js").AsTask());
 
             _jsModule = await moduleTask.Value;
         }
@@ -142,8 +146,6 @@
             messages.Add(new IntelligentAI.Records.Universal.Message(Role: "assistant", Content: _currentStreamMessage));
 
             _currentStreamMessage = string.Empty;
-
-            await _jsModule.InvokeVoidAsync("scrollToBottom", "messageContainer");
         }
 
         if (string.IsNullOrWhiteSpace(_inputMessage)) return;
@@ -151,8 +153,6 @@
         var streamingContentBuilder = new System.Text.StringBuilder();
 
         _cts = new CancellationTokenSource();
-
-        _loading = true; await InvokeAsync(StateHasChanged);
 
         // 创建请求对象
         var request = new AiArguments(
@@ -163,12 +163,14 @@
 
         messages.Add(new IntelligentAI.Records.Universal.Message(Role: "user", Content: _inputMessage));
 
-        _inputMessage = string.Empty;
+        await _jsModule.InvokeVoidAsync("scrollToBottom", "messageContainer");
 
-        await InvokeAsync(StateHasChanged);
+        _inputMessage = string.Empty; StateHasChanged();
 
         try
         {
+            _loading = true; await InvokeAsync(StateHasChanged);
+
             await foreach (var message in ModelService.AnswerStringsAsync(request, cancellationToken: _cts.Token))
             {
                 if (string.IsNullOrEmpty(message))
@@ -204,9 +206,11 @@
     {
         return role switch
         {
-            "assistant" => _systemDefinition != "heart" ? "avatars/assistant.jpg" : "avatars/default.jpg",
-            "user" => "avatars/user.jpg",
-            _ => "avatars/default.jpg"
+            "assistant" => _systemDefinition != "heart" 
+                ? "_content/IntelligentAI.Components/avatars/assistant.jpg" 
+                : "_content/IntelligentAI.Components/avatars/default.jpg",
+            "user" => "_content/IntelligentAI.Components/avatars/user.jpg",
+            _ => "_content/IntelligentAI.Components/avatars/default.jpg"
         };
     }
 
@@ -266,6 +270,14 @@
 
         await InvokeAsync(StateHasChanged);
 
+    }
+
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.ShiftKey && e.Key == "Enter")
+        {
+            await SendQuestionAsync();
+        }
     }
 
 

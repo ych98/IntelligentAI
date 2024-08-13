@@ -10,10 +10,6 @@
     <None Remove="Universal\MarkdownSection.razor.js" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Content Include="Universal\DisplayGroup\MarkdownSection.razor.js" />
-  </ItemGroup>
-
 
   <ItemGroup>
     <SupportedPlatform Include="browser" />

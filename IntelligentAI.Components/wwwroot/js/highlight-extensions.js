@@ -14,6 +14,7 @@ const highlight = hljs_addJavaScript('https://cdn.jsdelivr.net/npm/@highlightjs/
 // Add custom code
 highlight.onload = () => {
     const hljsRazor = hljs_addJavaScript('https://cdn.jsdelivr.net/npm/highlightjs-cshtml-razor@2.1.1/dist/cshtml-razor.min.js');
+    const hljsCSharp = hljs_addJavaScript('https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/csharp.min.js');
 
     // Switch highlight Dark/Light theme
     const theme = document.querySelector('loading-theme > fluent-design-theme');

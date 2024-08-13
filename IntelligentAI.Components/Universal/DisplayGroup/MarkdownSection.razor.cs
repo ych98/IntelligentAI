@@ -13,8 +13,6 @@ namespace IntelligentAI.Components.Universal.DisplayGroup;
 
 public partial class MarkdownSection : FluentComponentBase
 {
-    private Lazy<Task<IJSObjectReference>> moduleTask;
-    private IJSObjectReference _jsModule;
     private bool _markdownChanged = false;
     private string? _content;
 
@@ -51,10 +49,10 @@ public partial class MarkdownSection : FluentComponentBase
         if (firstRender)
         {
             // import code for highlighting code blocks
-            moduleTask = new(() => JsRuntime.InvokeAsync<IJSObjectReference>(
-                "import", "./_content/IntelligentAI.Components/Universal/DisplayGroup/MarkdownSection.razor.js").AsTask());
+            //moduleTask = new(() => JsRuntime.InvokeAsync<IJSObjectReference>(
+            //    "import", "./_content/IntelligentAI.Components/Universal/DisplayGroup/MarkdownSection.razor.js").AsTask());
 
-            _jsModule = await moduleTask.Value;
+            //_jsModule = await moduleTask.Value;
         }
 
         if (firstRender || _markdownChanged)
@@ -72,9 +70,9 @@ public partial class MarkdownSection : FluentComponentBase
                 await OnContentConverted.InvokeAsync();
             }
 
-            await _jsModule.InvokeVoidAsync("highlight");
+            await JsRuntime.InvokeVoidAsync("highlightSnippet");
 
-            await _jsModule.InvokeVoidAsync("addCopyButton");
+            await JsRuntime.InvokeVoidAsync("addCopyButton");
         }
 
     }

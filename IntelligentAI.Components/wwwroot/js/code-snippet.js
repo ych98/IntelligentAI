@@ -1,4 +1,5 @@
-﻿export function addCopyButton() {
+
+function addCopyButton() {
     var snippets = document.querySelectorAll('.snippet');
     var numberOfSnippets = snippets.length;
     for (var i = 0; i < numberOfSnippets; i++) {

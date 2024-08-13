@@ -52,93 +52,14 @@ public class Article
 
     //
     // 摘要:
-    //     首版 1：代表首版 其他信息：空
-    public string Papercount { get; set; }
-
-    //
-    // 摘要:
-    //     专刊
-    public string Specialissue { get; set; }
-
-    //
-    // 摘要:
-    //     专刊期号
-    public string Specialissueno { get; set; }
-
-    //
-    // 摘要:
-    //     版次
-    public string Revision { get; set; }
-
-    //
-    // 摘要:
-    //     版面
-    public string Page { get; set; }
-
-    //
-    // 摘要:
-    //     责任编辑
-    public string Maineditor { get; set; }
-
-    //
-    // 摘要:
-    //     地区
-    public string Region { get; set; }
-
-    //
-    // 摘要:
-    //     地区编码
-    public string Isocode { get; set; }
-
-    //
-    // 摘要:
-    //     区县ID
-    public int Townid { get; set; }
-
-    //
-    // 摘要:
-    //     分类
-    public string Itemtype { get; set; }
-
-    //
-    // 摘要:
-    //     体裁
-    public string Literaturetype { get; set; }
-
-    //
-    // 摘要:
-    //     人物
-    public string Figure { get; set; }
-
-    //
-    // 摘要:
-    //     来源
-    public string Articlesource { get; set; }
-
-    //
-    // 摘要:
-    //     文章顺序
-    public int Articlesort { get; set; }
-
-    //
-    // 摘要:
     //     栏目
-    public string Typename { get; set; }
-
-    //
-    // 摘要:
-    //     引题
-    public string Parenttitle { get; set; }
+    [JsonPropertyName("typename")]
+    public string TypeName { get; set; }
 
     //
     // 摘要:
     //     标题
     public string Title { get; set; }
-
-    //
-    // 摘要:
-    //     标题字数
-    public int Titlewordscount { get; set; }
 
     //
     // 摘要:
@@ -176,10 +97,6 @@ public class Article
     //     文章公开控制
     public int Issue { get; set; }
 
-    //
-    // 摘要:
-    //     版本说明
-    public string Version { get; set; }
 
     //
     // 摘要:
@@ -195,21 +112,6 @@ public class Article
     // 摘要:
     //     链接URL
     public string Linkurl { get; set; }
-
-    //
-    // 摘要:
-    //     内容所在PDF页码
-    public string Pdfpageno { get; set; }
-
-    //
-    // 摘要:
-    //     页面PDF资源文件
-    public string Pdfsource { get; set; }
-
-    //
-    // 摘要:
-    //     页面PDF资源文件字节数
-    public long Pdfsize { get; set; }
 
     //
     // 摘要:
@@ -244,7 +146,7 @@ public class Article
     //
     // 摘要:
     //     正负面的值 1---10000 ， 1：1%正面 ，10000：100%正面
-    public long Videosize { get; set; }
+    public int Videosize { get; set; }
 
     //
     // 摘要:
@@ -318,11 +220,6 @@ public class Article
 
     //
     // 摘要:
-    //     创建时间_suoyin
-    public DateTime Createindex_time { get; set; }
-
-    //
-    // 摘要:
     //     标题相似 @雷哥 相似ID,索引里存储的是 sameid
     public string Same_id { get; set; }
 
@@ -368,52 +265,6 @@ public class Article
 
     //
     // 摘要:
-    //     阅读量
-    public int Readcount { get; set; }
-
-    //
-    // 摘要:
-    //     点赞量
-    public int Agreecount { get; set; }
-
-    //
-    // 摘要:
-    //     转发量
-    public int Forwardcount { get; set; }
-
-    //
-    // 摘要:
-    //     评论量
-    public int Commentcount { get; set; }
-
-    //
-    // 摘要:
-    //     收藏量
-    public int Collectcount { get; set; }
-
-    //
-    // 摘要:
-    //     热点文章热度点击量
-    public int Clickcount { get; set; }
-
-    //
-    // 摘要:
-    //     转载数量
-    public int Reprintcount { get; set; }
-
-    //
-    // 摘要:
-    //     转载媒体数量
-    public int Reprintmediacount { get; set; }
-
-    public int Remediacount { get; set; }
-
-    public int Rearticlecount { get; set; }
-
-    public int Uvcount { get; set; }
-
-    //
-    // 摘要:
     //     来源url 。微信中有一个 外部的原网url。
     public string Sourceurl { get; set; }
 
@@ -426,12 +277,6 @@ public class Article
     // 摘要:
     //     视屏数量
     public long Vc { get; set; }
-
-    public string Isposts { get; set; }
-
-    public int Istong { get; set; }
-
-    public int Isnfmg { get; set; }
 
     //
     // 摘要:
@@ -452,7 +297,7 @@ public class Article
     public long[] Tags { get; set; }
 
     [JsonPropertyName("samecount")]
-    public string SameCount { get; set; }
+    public int SameCount { get; set; }
 
     //
     // 摘要:

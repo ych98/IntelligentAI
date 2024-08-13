@@ -30,11 +30,8 @@ public partial class CodeSnippet
     {
         if (firstRender)
         {
-
             await JSRuntime.InvokeVoidAsync("hljs.highlightElement", codeElement);
-            _jsModule = await JSRuntime.InvokeAsync<IJSObjectReference>("import",
-                "./_content/IntelligentAI.Components/Universal/DisplayGroup/CodeSnippet.razor.js");
-            await _jsModule.InvokeVoidAsync("addCopyButton");
+            await JSRuntime.InvokeVoidAsync("addCopyButton");
         }
     }
 }

@@ -31,9 +31,19 @@
     <!-- highlight -->
     <script type="text/javascript" src="_content/IntelligentAI.Components/js/highlight-extensions.js"></script>
 
+    <script>
+        window.highlightSnippet = function () {
+            document.querySelectorAll('pre code').forEach((el) => {
+                hljs.highlightBlock(el);
+            });
+        }
+    </script>
+
+    <!-- code -->
+    <script type="text/javascript" src="_content/IntelligentAI.Components/js/code-snippet.js"></script>
+
     <!-- diagrams -->
     <script src="_content/Z.Blazor.Diagrams/script.min.js"></script>
-
 
 </body>
 

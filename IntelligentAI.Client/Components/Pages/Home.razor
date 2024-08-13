@@ -6,27 +6,3 @@
 <p>
     Welcome to your new app.
 </p>
-
-
-@code {
-    private string _codeSnippet = "**请求体示例**\n\n```json\n{\n    \"ids\": [\"6a2b714ea77d3f2e879c647b01a234aa\"]\n }\n```";
-
-
-    protected override async Task OnInitializedAsync()
-    {
-        string fullPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "README.md");
-
-        if (File.Exists(fullPath))
-        {
-            // 以共享读取和写入的方式打开文件
-            using (var fileStream = new FileStream(fullPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-
-            using (var reader = new StreamReader(fileStream))
-            {
-                _codeSnippet = reader.ReadToEnd();
-            }
-
-        }
-        await base.OnInitializedAsync();
-    }
-}
