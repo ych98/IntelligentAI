@@ -220,6 +220,7 @@
                 PageIndex = 1,
                 PageSize = _maxTopicCount,
                 GroupArticletypes = _visibleResourceTypes.Select(str => (GroupArticleType)Enum.Parse(typeof(GroupArticleType), str)).ToArray(),
+                ContentWordsCount = new IntRange() { From = 200, To = 4000 },
                 OrderBy = "score desc"
             };
 

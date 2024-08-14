@@ -165,7 +165,10 @@
 
         await _jsModule.InvokeVoidAsync("scrollToBottom", "messageContainer");
 
-        _inputMessage = string.Empty; StateHasChanged();
+        // 输入框恢复初始状态
+        _inputMessage = string.Empty; 
+        _rows = 2; 
+        StateHasChanged();
 
         try
         {
