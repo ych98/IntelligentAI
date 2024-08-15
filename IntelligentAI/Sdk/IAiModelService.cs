@@ -1,7 +1,5 @@
 ﻿using IntelligentAI.Enumerations;
 using IntelligentAI.Models;
-using IntelligentAI.Models.Search;
-using IntelligentAI.Records.Fanews;
 
 namespace IntelligentAI.Sdk;
 
@@ -40,25 +38,6 @@ public interface IAiModelService
 
     #endregion
 
-    #region Event
-    Task<List<EventVenation>> GetEventsAsync(
-        SearchArgs arguments,
-        double minScore = 0.53,
-        int count = 3,
-        string codition = "article",
-        CancellationToken cancellationToken = default);
-
-    Task<List<EventVenation>> GetEventsByVectorAsync(
-        SearchArgs arguments,
-        double minScore = 0.53,
-        CancellationToken cancellationToken = default);
-
-    Task<List<EventVenation>> GetEventsByCoreWordsAsync(
-        SearchArgs arguments,
-        bool analyzeKeyword = true,
-        CancellationToken cancellationToken = default);
-    #endregion
-
     #region Prompt
     Task<string> GetPromptAsync(
         string id,
@@ -92,34 +71,6 @@ public interface IAiModelService
     Task<string[]> GetContentsAsync(
         string html,
         CancellationToken cancellation = default);
-    #endregion
-
-    #region Article
-
-    Task<IEnumerable<Article>> GetTopicArticlesAsync(
-       SearchArgs arguments,
-       CancellationToken cancellationToken = default);
-
-    Task<IEnumerable<Article>> GetArticlesAsync(
-        SearchArgs arguments,
-        CancellationToken cancellationToken = default);
-
-    Task<IEnumerable<Article>> GetVectorArticlesAsync(
-        SearchArgs arguments,
-        double minScore = 0.53,
-        bool sift = false,
-        CancellationToken cancellationToken = default);
-
-    Task<IEnumerable<Article>> GetArticlesByIdsAsync(
-        IEnumerable<long> ids, 
-        string? fields = null,
-        CancellationToken cancellationToken = default);
-
-    Task<Article> GetArticleByIdAsync(
-        long id,
-        string? fields = null,
-        CancellationToken cancellationToken = default);
-
     #endregion
 
     #region Business

@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace IntelligentAI.Models.Search;
+namespace IntelligentAI.Components.Models.Search;
 
 public class Article
 {

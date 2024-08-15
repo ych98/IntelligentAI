@@ -1,8 +1,6 @@
 ﻿using IntelligentAI.Models;
 using Microsoft.Extensions.DependencyInjection;
 using System.Runtime.CompilerServices;
-using IntelligentAI.Records.Fanews;
-using IntelligentAI.Models.Search;
 
 namespace IntelligentAI.Sdk;
 
@@ -14,7 +12,6 @@ public class AiModelService : ApiBase, IAiModelService
     {
         _clientFactory = clientFactory ?? throw new ArgumentNullException(nameof(clientFactory));
     }
-
 
     #region Models
 
@@ -119,50 +116,6 @@ public class AiModelService : ApiBase, IAiModelService
         {
             yield return message;
         }
-    }
-
-    #endregion
-
-    #region Event
-    public async Task<List<EventVenation>> GetEventsAsync(
-        SearchArgs arguments,
-        double minScore = 0.53,
-        int count = 3,
-        string codition = "article",
-        CancellationToken cancellationToken = default)
-    {
-        string url = $"/FanewsSearch/GetEvents?minScore={minScore}&coreWordsCount={count}&secondaryCondition={codition}";
-        return await CallAsync<SearchArgs, List<EventVenation>>(
-            FanewsApiEnum.FanewsIntelligence.Name,
-            url,
-            arguments,
-            cancellation: cancellationToken);
-    }
-
-    public async Task<List<EventVenation>> GetEventsByCoreWordsAsync(
-        SearchArgs arguments,
-        bool analyzeKeyword = true,
-        CancellationToken cancellationToken = default)
-    {
-        string url = $"/FanewsSearch/GetEventsByCoreWords?analyzeKeyword={analyzeKeyword}";
-        return await CallAsync<SearchArgs, List<EventVenation>>(
-            FanewsApiEnum.FanewsIntelligence.Name,
-            url,
-            arguments,
-            cancellation: cancellationToken);
-    }
-
-    public async Task<List<EventVenation>> GetEventsByVectorAsync(
-        SearchArgs arguments,
-        double minScore = 0.53,
-        CancellationToken cancellationToken = default)
-    {
-        string url = $"/FanewsSearch/GetEventsByVector?minScore={minScore}";
-        return await CallAsync<SearchArgs, List<EventVenation>>(
-            FanewsApiEnum.FanewsIntelligence.Name,
-            url,
-            arguments,
-            cancellation: cancellationToken);
     }
 
     #endregion
@@ -276,69 +229,6 @@ public class AiModelService : ApiBase, IAiModelService
             yield return message;
         }
 
-    }
-
-    #endregion
-
-
-    #region Article
-
-    public async Task<IEnumerable<Article>> GetArticlesAsync(SearchArgs arguments, CancellationToken cancellationToken = default)
-    {
-        string url = $"/FanewsSearch/GetArticles";
-
-        return await CallAsync<SearchArgs, IEnumerable<Article>>(
-            FanewsApiEnum.FanewsIntelligence.Name,
-            url,
-            arguments,
-            cancellation: cancellationToken);
-    }
-
-    public async Task<IEnumerable<Article>> GetTopicArticlesAsync(SearchArgs arguments, CancellationToken cancellationToken = default)
-    {
-        string url = $"/FanewsSearch/GetTopicArticles";
-        return await CallAsync<SearchArgs, IEnumerable<Article>>(
-            FanewsApiEnum.FanewsIntelligence.Name,
-            url,
-            arguments,
-            cancellation: cancellationToken);
-    }
-
-    public async Task<IEnumerable<Article>> GetVectorArticlesAsync(
-        SearchArgs arguments,
-        double minScore = 0.53,
-        bool sift = false,
-        CancellationToken cancellationToken = default)
-    {
-        string url = $"/FanewsSearch/GetVectorArticles?minScore={minScore}&sift={sift}";
-
-        return await CallAsync<SearchArgs, IEnumerable<Article>>(
-            FanewsApiEnum.FanewsIntelligence.Name,
-            url,
-            arguments,
-            cancellation: cancellationToken);
-    }
-
-
-    public async Task<IEnumerable<Article>> GetArticlesByIdsAsync(IEnumerable<long> ids, string? fields = null, CancellationToken cancellationToken = default)
-    {
-        string url = $"/Search/GetArticlesByIds?fields={fields}";
-
-        return await CallAsync<IEnumerable<long>, IEnumerable<Article>>(
-            FanewsApiEnum.FanewsIntelligence.Name,
-            url,
-            ids,
-            cancellation: cancellationToken);
-    }
-
-    public async Task<Article> GetArticleByIdAsync(long id, string? fields = null, CancellationToken cancellationToken = default)
-    {
-        string url = $"/Search/GetArticle?id={id}&fields={fields}";
-
-        return await GetAsync<Article>(
-            FanewsApiEnum.FanewsIntelligence.Name,
-            url,
-            cancellation: cancellationToken);
     }
 
     #endregion

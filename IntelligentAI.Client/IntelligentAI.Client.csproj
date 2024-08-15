@@ -45,8 +45,6 @@
         <AppInstallerUri>http://fwimage.cnfanews.com/hzfanewsmanage/intelligenceversions/IntelligentAI.Client.AppInstaller</AppInstallerUri>
         <HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
         <Platforms>AnyCPU;x64;x86</Platforms>
-        <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
-        <PackageCertificateThumbprint>ED5BD6C80AA7FE99DF811679E2927D48421D9D85</PackageCertificateThumbprint>
     </PropertyGroup>
 	
 	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows' and '$(Configuration)' == 'Release'">
@@ -57,8 +55,40 @@
 	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows' and '$(RuntimeIdentifierOverride)' != ''">
 		<RuntimeIdentifier>$(RuntimeIdentifierOverride)</RuntimeIdentifier>
 	</PropertyGroup>
-	
-    <ItemGroup>
+
+	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
+		<EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-android|AnyCPU'">
+	  <EmbedAssembliesIntoApk>True</EmbedAssembliesIntoApk>
+	  <AndroidKeyStore>False</AndroidKeyStore>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-android|x64'">
+	  <EmbedAssembliesIntoApk>True</EmbedAssembliesIntoApk>
+	  <AndroidKeyStore>False</AndroidKeyStore>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-android|x86'">
+	  <EmbedAssembliesIntoApk>True</EmbedAssembliesIntoApk>
+	  <AndroidKeyStore>False</AndroidKeyStore>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-android|AnyCPU'">
+	  <AndroidKeyStore>False</AndroidKeyStore>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-android|x64'">
+	  <AndroidKeyStore>False</AndroidKeyStore>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-android|x86'">
+	  <AndroidKeyStore>False</AndroidKeyStore>
+	</PropertyGroup>
+
+
+	<ItemGroup>
         <!-- App Icon -->
         <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
 

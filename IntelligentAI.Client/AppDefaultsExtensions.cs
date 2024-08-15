@@ -7,8 +7,6 @@ using OpenTelemetry.Trace;
 using Polly;
 using System.Net;
 using NLog.Extensions.Logging;
-using IntelligentAI.Enumerations;
-using IntelligentAI.Sdk;
 
 namespace Microsoft.Extensions.Hosting;
 
@@ -143,9 +141,17 @@ public static class AppDefaultsExtensions
     {
         SetIntelligentEnvironmentVariables();
 
-        var apiservice = builder.Configuration["INTELLIGENTAI_APISERVICE"] ?? "https+http://apiservice";
+        var apiService = builder.Configuration["INTELLIGENTAI_APISERVICE"] ?? "https+http://apiservice";
 
-        builder.Services.AddAiService(new AiOptions(apiservice));
+        var fanewsService = builder.Configuration["INTELLIGENTAI_FANEWSSERVICE"] ?? "https+http://apiservice";
+
+        builder.Services.AddAiService(new AiOptions(apiService));
+
+        builder.Services.AddHttpClient<EventApiClient>(client =>
+        {
+            client.BaseAddress = new(fanewsService);
+            client.Timeout = TimeSpan.FromMinutes(5);
+        });
 
         return builder;
     }

@@ -1,7 +1,10 @@
-﻿@using IntelligentAI.Models.Search
+﻿@using IntelligentAI.Components.Pages.FanewsGroup
+@using Models.Search
 
 @inject IToastService ToastService
 @inject IAiModelService ModelService
+
+@inject EventApiClient EventApi
 
 <div style="display: flex; flex-direction:row;  ">
     <div style="margin-right: 10px;">
@@ -12,7 +15,9 @@
     </div>
 </div>
 
-<p></p>
+<br />
+
+<div>
 <FluentLabel>Types:</FluentLabel>
 <FluentCheckbox Style="margin-top: 10px;" Label="@($"Select All")"
                 ThreeState="true"
@@ -28,16 +33,45 @@
                         @bind-Value:set="c => OnResourceTypeVisibilityChanged(resourceType, c)" />
     }
 </FluentStack>
-<p></p>
+</div>
 
-<FluentNumberField @bind-Value="_maxTopicCount" Label="Max Count:" />
-<p></p>
+<br />
 
-<FluentCombobox Placeholder="Please select a mode" ReadOnly="true" Items="@EventModes" @bind-Value="@_selectedMode" Label="Event Mode:" />
-<p></p>
+<div>
+    <FluentNumberField @bind-Value="_maxTopicCount" Label="Max Count:" />
+</div>
+
+<br />
+
+<div>
+
+    <FluentSelect Items="@EventOptions"
+                  style="width: 300px;"
+                  Id="model-listbox"
+                  OptionValue="@(m => m.Value.ToString())"
+                  OptionText="@(m => m.Text)"
+                  OptionSelected="@(m => m.Selected)"
+                  Label="Event Base Mode:"
+                  @bind-Value="@_selectedBaseMode" />
+
+</div>
+
+<br/>
+
+<div>
+    <FluentSelect Items="@AdditionalModeOptions"
+                  style="width: 300px;"
+                  Id="model-listbox"
+                  OptionValue="@(m => m.Value)"
+                  OptionText="@(m => m.Text)"
+                  OptionSelected="@(m => m.Selected)"
+                  Label="Event Additional Mode:"
+                  @bind-Value="@_selectedMode" />
+</div>
+
+<br />
 
 <FluentLabel>Question:</FluentLabel>
-
 <div style="position: relative; width: 100%;">
     <FluentTextArea Disabled="@(Loading)" Rows="3" @bind-Value="@UserQuestion" Resize="TextAreaResize.Vertical" Placeholder="有问题尽管问我吧..." style="width: 100%; height: 100%; border: none; margin-right: 50px;" />
     @if (Loading)
@@ -57,48 +91,78 @@
 
     </FluentButton>
 </div>
-<br>
 
 @code {
+    private CancellationTokenSource _cts;
+
     private int _maxTopicCount = 10;
 
-    private string _selectedMode = "Vector";
+    private string _selectedMode = "none";
+
+    private string _selectedBaseMode = "1";
 
     private DateTime? _selectedDateFrom = DateTime.Today.AddMonths(-1);
 
     private DateTime? _selectedDateTo = DateTime.Today.AddDays(1);
 
-    private readonly Array _allResourceTypes = System.Enum.GetValues(typeof(GroupArticleType));
+    private readonly Array _allResourceTypes = System.Enum.GetValues(typeof(Models.Search.GroupArticleType));
 
-    private IEnumerable<string> _allTypes => _allResourceTypes.OfType<GroupArticleType>()
+    private IEnumerable<string> _allTypes => _allResourceTypes.OfType<Models.Search.GroupArticleType>()
         .Where(type => (int)type > 0 && (int)type < 6)
         .Select(type => type.ToString());
 
     private HashSet<string> _visibleResourceTypes = new HashSet<string>();
 
-    public string[] EventModes =>
+    public string[] AdditionalModes =>
     [
-        "Vector",
-    "CoreWords",
-    "Vector + CoreWords",
-    "CoreWords + Vector"
+        "none",
+    "all",
+    "event",
+    "abstraction"
     ];
+
+    public List<Option<string>> AdditionalModeOptions = new()
+    {
+        { new Option<string> { Value = "none", Text = "无", Icon = (new Icons.Regular.Size16.AnimalRabbit(), Color.Neutral, "start"  ), Selected = true } },
+        { new Option<string> { Value = "all", Text = "脉络时间，脉络标题，脉络概要", Icon = (new Icons.Regular.Size16.AnimalRabbit(), Color.Neutral, "start"  ) } },
+        { new Option<string> { Value = "event", Text = "脉络时间", Icon = (new Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  ) } },
+        { new Option<string> { Value = "abstraction", Text = "脉络标题，脉络概要", Icon = (new Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  ) } },
+    };
+
+    public List<Option<int>> EventOptions = new()
+    {
+        { new Option<int> { Value = 1, Text = "语义检索", Icon = (new Icons.Regular.Size16.AnimalRabbit(), Color.Neutral, "start"  ), Selected = true } },
+        { new Option<int> { Value = 2, Text = "智能检索", Icon = (new Icons.Regular.Size16.AnimalRabbit(), Color.Neutral, "start"  ) } },
+
+        { new Option<int> { Value = 11, Text = "语义检索 + 提问凡闻分词 + 高级检索", Icon = (new Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  ) } },
+        { new Option<int> { Value = 12, Text = "语义检索 + 提问模型分词 + 高级检索", Icon = (new Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  ) } },
+        { new Option<int> { Value = 13, Text = "语义检索 + 文章凡闻分词 + 高级检索", Icon = (new Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  ) } },
+        { new Option<int> { Value = 14, Text = "语义检索 + 文章模型分词 + 高级检索", Icon = (new Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  ) } },
+
+        { new Option<int> { Value = 15, Text = "语义检索 + 提问凡闻分词 + 智能检索", Icon = (new Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  )} },
+        { new Option<int> { Value = 16, Text = "语义检索 + 提问模型分词 + 智能检索", Icon = (new Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  ) } },
+        { new Option<int> { Value = 17, Text = "语义检索 + 文章凡闻分词 + 智能检索", Icon = (new Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  ) } },
+        { new Option<int> { Value = 18, Text = "语义检索 + 文章模型分词 + 智能检索", Icon = (new Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  ) } },
+
+        { new Option<int> { Value = 31, Text = "智能检索 + 文章模型摘要 + 语义检索", Icon = (new Icons.Regular.Size16.AnimalCat(), Color.Neutral, "start"  ) } },
+        { new Option<int> { Value = 32, Text = "智能检索 + 文章凡闻摘要 + 语义检索", Icon = (new Icons.Regular.Size16.AnimalCat(), Color.Neutral, "start"  ) } },
+
+        { new Option<int> { Value = 91, Text = "分词判断 + 自动模式", Icon = (new Icons.Regular.Size16.AnimalTurtle(), Color.Neutral, "start"  ) } },
+        { new Option<int> { Value = 92, Text = "分词判断 + 自动模式 + 精准检索", Icon = (new Icons.Regular.Size16.AnimalTurtle(), Color.Neutral, "start"  ) } },
+        { new Option<int> { Value = 93, Text = "字数判断 + 自动模式 + 精准检索", Icon = (new Icons.Regular.Size16.AnimalTurtle(), Color.Neutral, "start"  ) } },
+        { new Option<int> { Value = 0, Text = "字数判断 + 自动模式", Icon = (new Icons.Regular.Size16.AnimalTurtle(), Color.Neutral, "start"  ) } },
+    };
 
     public string UserQuestion { get; set; }
 
     [Parameter]
-    public EventCallback<IEnumerable<EventVenation>> OnEventsReceived { get; set; }
-    [Parameter]
-    public EventCallback<string> OnQuestionReceived { get; set; }
+    public EventCallback<IEnumerable<Pages.FanewsGroup.EventResult>> OnEventsReceived { get; set; }
 
     [Parameter]
     public int SelectedModel { get; set; } = 12;
 
     // 外部对脉络进行处理过程中，禁止搜索新的脉络
     public bool Loading { get; set; } = false;
-
-    // 外部对脉络进行处理过程中取消，内部也取消
-    public CancellationTokenSource Cts { get; set; } = new CancellationTokenSource();
 
     #region 事件触发
 
@@ -112,7 +176,7 @@
 
     private async Task CancelAsync()
     {
-        await Cts.CancelAsync();
+        await _cts.CancelAsync();
 
         Loading = false;
 
@@ -125,7 +189,7 @@
 
         #region Initialization
 
-        Cts = new CancellationTokenSource();
+        _cts = new CancellationTokenSource();
 
         Loading = true;
 
@@ -133,13 +197,7 @@
 
         #endregion
 
-        if (OnQuestionReceived.HasDelegate)
-        {
-            // 触发事件
-            await OnQuestionReceived.InvokeAsync(UserQuestion);
-        }
-
-        var events = await CallEventsAsync(Cts.Token);
+        var events = await CallEventsAsync(_cts.Token);
 
         if (events is null || !events.Any())
         {
@@ -202,71 +260,35 @@
             _visibleResourceTypes.Remove(resourceType);
         }
     }
-
-
     #endregion
 
     #region 服务调用
 
-
-    private async Task<List<EventVenation>> CallEventsAsync(CancellationToken cancellation = default)
+    private async Task<Pages.FanewsGroup.EventResult[]> CallEventsAsync(CancellationToken cancellation = default)
     {
-        var result = new List<EventVenation>();
+        var result = new List<Pages.FanewsGroup.EventResult>();
 
-        var searchArgs = new SearchArgs()
+        var searchArgs = new Models.Search.SearchArgs()
             {
-                Keywords = new List<Keyword>() { new Keyword() { Word = UserQuestion } },
-                Date = new DateRange() { From = _selectedDateFrom.Value, To = _selectedDateTo.Value },
+                Keywords = new List<Models.Search.Keyword>() { new Models.Search.Keyword() { Word = UserQuestion } },
+                Date = new Models.Search.DateRange() { From = _selectedDateFrom.Value, To = _selectedDateTo.Value },
                 PageIndex = 1,
                 PageSize = _maxTopicCount,
-                GroupArticletypes = _visibleResourceTypes.Select(str => (GroupArticleType)Enum.Parse(typeof(GroupArticleType), str)).ToArray(),
-                ContentWordsCount = new IntRange() { From = 200, To = 4000 },
-                OrderBy = "score desc"
+                GroupArticletypes = _visibleResourceTypes.Select(str => (Models.Search.GroupArticleType)Enum.Parse(typeof(Models.Search.GroupArticleType), str)).ToArray(),
+                ContentWordsCount = new IntRange() { From = 200, To = 4000 }
             };
 
-        var eventTask = _selectedMode switch
-        {
-            "Vector" => ModelService.GetEventsByVectorAsync(searchArgs, cancellationToken: cancellation),
-            "CoreWords" => ModelService.GetEventsByCoreWordsAsync(searchArgs, analyzeKeyword: false, cancellationToken: cancellation),
-            "Vector + CoreWords" => ModelService.GetEventsAsync(searchArgs, cancellationToken: cancellation),
-            "CoreWords + Vector" => CallCoreWordsSecondarySearchEventsAsync(searchArgs, cancellation: cancellation),
-            _ => ModelService.GetEventsByVectorAsync(searchArgs, cancellationToken: cancellation)
-        };
+        var events = await EventApi.GetEventsAsync(searchArgs, _selectedBaseMode, _selectedMode, cancellation);
 
-        result = await eventTask;
-
-        return result;
+        return events;
     }
-
-    private async Task<List<EventVenation>> CallCoreWordsSecondarySearchEventsAsync(
-        SearchArgs searchArgs,
-        CancellationToken cancellation = default)
-    {
-        var firstSearchList = await ModelService.GetEventsByCoreWordsAsync(searchArgs, analyzeKeyword: false, cancellationToken: cancellation);
-
-        var firstArticle = await ModelService.GetArticleByIdAsync(firstSearchList.First().Id);
-
-        var replaces = new Dictionary<string, string>()
-            {
-                ["正文"] = firstArticle.Contenttxt
-            };
-
-        var first = await ModelService.AnswerTextByPromptAsync("prompt10", replaces, SelectedModel, cancellation);
-
-        searchArgs.Keywords.First(key => key.AndOrNot == 0).Word = first;
-
-        var secondarySearchList = await ModelService.GetEventsByVectorAsync(cancellationToken: cancellation, arguments: searchArgs);
-
-        return secondarySearchList;
-    }
-
 
     #endregion
 
     public void Dispose()
     {
-        Cts?.Cancel();
-        Cts?.Dispose();
+        _cts?.Cancel();
+        _cts?.Dispose();
     }
 
 }
