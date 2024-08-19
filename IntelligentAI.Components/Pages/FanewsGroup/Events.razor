@@ -35,13 +35,6 @@
         await InvokeAsync(StateHasChanged);
     }
 
-    private async Task ReceiveQuestionAsync(string question)
-    {
-        _userQuestion = question;
-
-        await InvokeAsync(StateHasChanged);
-    }
-
     #endregion
 
     public void Dispose()

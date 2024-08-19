@@ -11,7 +11,7 @@
         <FluentDatePicker Label="News Date Start:" @bind-Value="@_selectedDateFrom" />
     </div>
     <div style="margin-right: 10px;">
-        <FluentDatePicker Label="News Date End:" AriaLabel="To" @bind-Value="@_selectedDateTo" />
+        <FluentDatePicker Label="News Date End:" @bind-Value="@_selectedDateTo" />
     </div>
 </div>
 
@@ -43,30 +43,28 @@
 
 <br />
 
-<div>
-
-    <FluentSelect Items="@EventOptions"
-                  style="width: 300px;"
-                  Id="model-listbox"
-                  OptionValue="@(m => m.Value.ToString())"
-                  OptionText="@(m => m.Text)"
-                  OptionSelected="@(m => m.Selected)"
-                  Label="Event Base Mode:"
-                  @bind-Value="@_selectedBaseMode" />
-
-</div>
-
-<br/>
-
-<div>
-    <FluentSelect Items="@AdditionalModeOptions"
-                  style="width: 300px;"
-                  Id="model-listbox"
-                  OptionValue="@(m => m.Value)"
-                  OptionText="@(m => m.Text)"
-                  OptionSelected="@(m => m.Selected)"
-                  Label="Event Additional Mode:"
-                  @bind-Value="@_selectedMode" />
+<div style="display: flex; flex-direction:row;  ">
+    <div style="margin-right: 10px;">
+        <FluentSelect Items="@EventOptions"
+                      Width="600px"
+                      Height="250px"
+                      Id="model-listbox"
+                      OptionValue="@(m => m.Value.ToString())"
+                      OptionText="@(m => m.Text)"
+                      OptionSelected="@(m => m.Selected)"
+                      Label="Event Mode Base:"
+                      @bind-Value="@_selectedBaseMode" />
+    </div>
+    <div style="margin-right: 10px;">
+        <FluentSelect Items="@AdditionalModeOptions"
+                      Width="200px"
+                      Id="model-listbox"
+                      OptionValue="@(m => m.Value)"
+                      OptionText="@(m => m.Text)"
+                      OptionSelected="@(m => m.Selected)"
+                      Label="Event Mode Additional:"
+                      @bind-Value="@_selectedMode" />
+    </div>
 </div>
 
 <br />
@@ -139,13 +137,36 @@
         { new Option<int> { Value = 13, Text = "语义检索 + 文章凡闻分词 + 高级检索", Icon = (new Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  ) } },
         { new Option<int> { Value = 14, Text = "语义检索 + 文章模型分词 + 高级检索", Icon = (new Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  ) } },
 
-        { new Option<int> { Value = 15, Text = "语义检索 + 提问凡闻分词 + 智能检索", Icon = (new Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  )} },
-        { new Option<int> { Value = 16, Text = "语义检索 + 提问模型分词 + 智能检索", Icon = (new Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  ) } },
-        { new Option<int> { Value = 17, Text = "语义检索 + 文章凡闻分词 + 智能检索", Icon = (new Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  ) } },
-        { new Option<int> { Value = 18, Text = "语义检索 + 文章模型分词 + 智能检索", Icon = (new Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  ) } },
+        { new Option<int> { Value = 15, Text = "语义检索 + 提问凡闻分词 + 辅助词 + 智能检索", Icon = (new Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  )} },
+        { new Option<int> { Value = 16, Text = "语义检索 + 提问模型分词 + 辅助词 + 智能检索", Icon = (new Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  ) } },
+        { new Option<int> { Value = 17, Text = "语义检索 + 文章凡闻分词 + 辅助词 + 智能检索", Icon = (new Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  ) } },
+        { new Option<int> { Value = 18, Text = "语义检索 + 文章模型分词 + 辅助词 + 智能检索", Icon = (new Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  ) } },
+        
+        { new Option<int> { Value = 19, Text = "语义检索 + 提问凡闻分词 + 智能检索", Icon = (new Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  )} },
+        { new Option<int> { Value = 20, Text = "语义检索 + 提问模型分词 + 智能检索", Icon = (new Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  ) } },
+        { new Option<int> { Value = 21, Text = "语义检索 + 文章凡闻分词 + 智能检索", Icon = (new Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  ) } },
+        { new Option<int> { Value = 22, Text = "语义检索 + 文章模型分词 + 智能检索", Icon = (new Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  ) } },
 
-        { new Option<int> { Value = 31, Text = "智能检索 + 文章模型摘要 + 语义检索", Icon = (new Icons.Regular.Size16.AnimalCat(), Color.Neutral, "start"  ) } },
-        { new Option<int> { Value = 32, Text = "智能检索 + 文章凡闻摘要 + 语义检索", Icon = (new Icons.Regular.Size16.AnimalCat(), Color.Neutral, "start"  ) } },
+        { new Option<int> { Value = 31, Text = "智能检索 + 文章模型摘要 + 语义检索", Icon = (new Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  ) } },
+        { new Option<int> { Value = 32, Text = "智能检索 + 文章凡闻摘要 + 语义检索", Icon = (new Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  ) } },
+
+        { new Option<int> { Value = 51, Text = "智能检索 + 首篇文章 + 语义检索 + 提问凡闻分词 + 高级检索", Icon = (new Icons.Regular.Size16.AnimalCat(), Color.Neutral, "start"  ) } },
+        { new Option<int> { Value = 52, Text = "智能检索 + 首篇文章 + 语义检索 + 提问模型分词 + 高级检索", Icon = (new Icons.Regular.Size16.AnimalCat(), Color.Neutral, "start"  ) } },
+        { new Option<int> { Value = 53, Text = "智能检索 + 首篇文章 + 语义检索 + 文章凡闻分词 + 高级检索", Icon = (new Icons.Regular.Size16.AnimalCat(), Color.Neutral, "start"  ) } },
+        { new Option<int> { Value = 54, Text = "智能检索 + 首篇文章 + 语义检索 + 文章模型分词 + 高级检索", Icon = (new Icons.Regular.Size16.AnimalCat(), Color.Neutral, "start"  ) } },
+
+        { new Option<int> { Value = 55, Text = "智能检索 + 首篇文章 + 语义检索 + 提问凡闻分词 + 辅助词 + 智能检索", Icon = (new Icons.Regular.Size16.AnimalCat(), Color.Neutral, "start"  )} },
+        { new Option<int> { Value = 56, Text = "智能检索 + 首篇文章 + 语义检索 + 提问模型分词 + 辅助词 + 智能检索", Icon = (new Icons.Regular.Size16.AnimalCat(), Color.Neutral, "start"  ) } },
+        { new Option<int> { Value = 57, Text = "智能检索 + 首篇文章 + 语义检索 + 文章凡闻分词 + 辅助词 + 智能检索", Icon = (new Icons.Regular.Size16.AnimalCat(), Color.Neutral, "start"  ) } },
+        { new Option<int> { Value = 58, Text = "智能检索 + 首篇文章 + 语义检索 + 文章模型分词 + 辅助词 + 智能检索", Icon = (new Icons.Regular.Size16.AnimalCat(), Color.Neutral, "start"  ) } },
+
+        { new Option<int> { Value = 59, Text = "智能检索 + 首篇文章 + 语义检索 + 提问凡闻分词 + 智能检索", Icon = (new Icons.Regular.Size16.AnimalCat(), Color.Neutral, "start"  )} },
+        { new Option<int> { Value = 60, Text = "智能检索 + 首篇文章 + 语义检索 + 提问模型分词 + 智能检索", Icon = (new Icons.Regular.Size16.AnimalCat(), Color.Neutral, "start"  ) } },
+        { new Option<int> { Value = 61, Text = "智能检索 + 首篇文章 + 语义检索 + 文章凡闻分词 + 智能检索", Icon = (new Icons.Regular.Size16.AnimalCat(), Color.Neutral, "start"  ) } },
+        { new Option<int> { Value = 62, Text = "智能检索 + 首篇文章 + 语义检索 + 文章模型分词 + 智能检索", Icon = (new Icons.Regular.Size16.AnimalCat(), Color.Neutral, "start"  ) } },
+
+        { new Option<int> { Value = 71, Text = "语义检索 + 文章模型分词 + 智能检索 + 文章模型摘要 + 语义检索", Icon = (new Icons.Regular.Size16.AnimalCat(), Color.Neutral, "start"  ) } },
+        { new Option<int> { Value = 72, Text = "语义检索 + 文章凡闻分词 + 智能检索 + 文章凡闻摘要 + 语义检索", Icon = (new Icons.Regular.Size16.AnimalCat(), Color.Neutral, "start"  ) } },
 
         { new Option<int> { Value = 91, Text = "分词判断 + 自动模式", Icon = (new Icons.Regular.Size16.AnimalTurtle(), Color.Neutral, "start"  ) } },
         { new Option<int> { Value = 92, Text = "分词判断 + 自动模式 + 精准检索", Icon = (new Icons.Regular.Size16.AnimalTurtle(), Color.Neutral, "start"  ) } },

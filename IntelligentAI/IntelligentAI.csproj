@@ -9,9 +9,9 @@
 	<Description>智能问答业务封装</Description>
 	<Platforms>AnyCPU;x86;x64</Platforms>
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
-	<PackageVersion>0.0.6</PackageVersion>
+	<PackageVersion>0.0.7</PackageVersion>
 	<PackageReleaseNotes>
-	  - 修复阿里云模型调用方法传入 Role 为 System 的消息的 Bug
+	  - 移除与大模型无关的参数类型和结果
 	</PackageReleaseNotes>
   </PropertyGroup>
 
