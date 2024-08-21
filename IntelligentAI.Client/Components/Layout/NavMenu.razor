@@ -26,7 +26,9 @@
             </FluentNavGroup>
 
             <FluentNavGroup Id="StockGroup" Title="Stock" @bind-Expanded=stockExpanded Icon="@(new Icons.Regular.Size20.Feed())">
-                <FluentNavLink Href="events" Icon="@(new Icons.Regular.Size20.Feed())" IconColor="Color.Accent">Events</FluentNavLink>
+                <FluentNavLink Href="stock/query" Icon="@(new Icons.Regular.Size20.Feed())" IconColor="Color.Accent">Query</FluentNavLink>
+                <FluentNavLink Href="stock/selection" Icon="@(new Icons.Regular.Size20.Feed())" IconColor="Color.Accent">Selection</FluentNavLink>
+                <FluentNavLink Href="stock/backtesting" Icon="@(new Icons.Regular.Size20.Feed())" IconColor="Color.Accent">Backtesting</FluentNavLink>
             </FluentNavGroup>
 
        </FluentNavMenu>

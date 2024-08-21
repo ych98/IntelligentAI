@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\IntelligentAI.Components\IntelligentAI.Components.csproj" />
     <ProjectReference Include="..\IntelligentAI.ServiceDefaults\IntelligentAI.ServiceDefaults.csproj" />
   </ItemGroup>
 

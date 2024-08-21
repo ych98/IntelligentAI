@@ -1,10 +1,11 @@
-﻿@using IntelligentAI.Components.Pages.FanewsGroup
+﻿@using IntelligentAI.Components.ApiClients
+@using IntelligentAI.Components.Pages.FanewsGroup
 @using Models.Search
 
 @inject IToastService ToastService
 @inject IAiModelService ModelService
 
-@inject EventApiClient EventApi
+@inject FanewsApiClient FanewsApi
 
 <div style="display: flex; flex-direction:row;  ">
     <div style="margin-right: 10px;">
@@ -57,7 +58,7 @@
     </div>
     <div style="margin-right: 10px;">
         <FluentSelect Items="@AdditionalModeOptions"
-                      Width="200px"
+                      Width="300px"
                       Id="model-listbox"
                       OptionValue="@(m => m.Value)"
                       OptionText="@(m => m.Text)"
@@ -177,7 +178,7 @@
     public string UserQuestion { get; set; }
 
     [Parameter]
-    public EventCallback<IEnumerable<Pages.FanewsGroup.EventResult>> OnEventsReceived { get; set; }
+    public EventCallback<IEnumerable<EventResult>> OnEventsReceived { get; set; }
 
     [Parameter]
     public int SelectedModel { get; set; } = 12;
@@ -285,9 +286,9 @@
 
     #region 服务调用
 
-    private async Task<Pages.FanewsGroup.EventResult[]> CallEventsAsync(CancellationToken cancellation = default)
+    private async Task<EventResult[]> CallEventsAsync(CancellationToken cancellation = default)
     {
-        var result = new List<Pages.FanewsGroup.EventResult>();
+        var result = new List<EventResult>();
 
         var searchArgs = new Models.Search.SearchArgs()
             {
@@ -299,7 +300,7 @@
                 ContentWordsCount = new IntRange() { From = 200, To = 4000 }
             };
 
-        var events = await EventApi.GetEventsAsync(searchArgs, _selectedBaseMode, _selectedMode, cancellation);
+        var events = await FanewsApi.GetEventsAsync(searchArgs, _selectedBaseMode, _selectedMode, cancellation);
 
         return events;
     }

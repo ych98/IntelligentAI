@@ -60,10 +60,6 @@ public static class AppDefaultsExtensions
             http.AddServiceDiscovery();
         });
 
-        builder.AddLog();
-
-        builder.AddAiService();
-
         return builder;
     }
 
@@ -126,52 +122,11 @@ public static class AppDefaultsExtensions
         return builder;
     }
 
-    
-
-    public static MauiAppBuilder AddLog(this MauiAppBuilder builder)
-    {
-        builder.Logging.AddSimpleConsole(options => options.TimestampFormat = "yyyy-MM-dd HH:mm:ss ");
-
-        builder.Logging.AddNLog("NLog.config");
-
-        return builder;
-    }
-
-    public static MauiAppBuilder AddAiService(this MauiAppBuilder builder)
-    {
-        SetIntelligentEnvironmentVariables();
-
-        var apiService = builder.Configuration["INTELLIGENTAI_APISERVICE"] ?? "https+http://apiservice";
-
-        var fanewsService = builder.Configuration["INTELLIGENTAI_FANEWSSERVICE"] ?? "https+http://apiservice";
-
-        builder.Services.AddAiService(new AiOptions(apiService));
-
-        builder.Services.AddHttpClient<EventApiClient>(client =>
-        {
-            client.BaseAddress = new(fanewsService);
-            client.Timeout = TimeSpan.FromMinutes(5);
-        });
-
-        return builder;
-    }
-
     private static void SetOpenTelemetryEnvironmentVariables()
     {
         foreach (KeyValuePair<string, string> setting in AspireAppSettings.Settings)
         {
             if (setting.Key.StartsWith("OTEL_"))
-            {
-                Environment.SetEnvironmentVariable(setting.Key, setting.Value);
-            }
-        }
-    }
-
-    private static void SetIntelligentEnvironmentVariables()
-    {
-        foreach (KeyValuePair<string, string> setting in AppSettings.Settings)
-        {
-            if (setting.Key.StartsWith("INTELLIGENTAI_"))
             {
                 Environment.SetEnvironmentVariable(setting.Key, setting.Value);
             }

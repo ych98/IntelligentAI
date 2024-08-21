@@ -31,6 +31,8 @@ namespace IntelligentAI.Client
 
             builder.AddAppDefaults();
 
+            builder.AddCustomServices();
+
             builder.Services.AddFluentUIComponents();
 
             builder.Services.AddMauiBlazorWebView();

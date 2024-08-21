@@ -1,4 +1,6 @@
-namespace IntelligentAI.Web;
+using System.Net.Http.Json;
+
+namespace IntelligentAI.Components.ApiClients;
 
 public class WeatherApiClient(HttpClient httpClient)
 {
