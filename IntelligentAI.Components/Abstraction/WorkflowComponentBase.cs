@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IntelligentAI.Abstraction;
+namespace IntelligentAI.Components.Abstraction;
 
 public class WorkflowComponentBase
 {

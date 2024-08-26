@@ -1,5 +1,7 @@
 ﻿
 using IntelligentAI.Records.Universal;
+using Microsoft.Extensions.Options;
+using System.Xml.Linq;
 
 namespace IntelligentAI.Models;
 
@@ -156,5 +158,12 @@ public class AiArguments
     public static bool operator !=(AiArguments left, AiArguments right)
     {
         return !(left == right);
+    }
+
+    public override string ToString()
+    {
+        var json = System.Text.Json.JsonSerializer.Serialize(this);
+
+        return json;
     }
 }

@@ -128,7 +128,7 @@ public class AiController : ControllerBase
 
         Dictionary<string, object> parameters = request.ToDictionary();
         parameters.Add("score", score);
-        parameters.Add("apiVersion", apiVersion);
+        //parameters.Add("apiVersion", apiVersion);
 
         await foreach (var result in model.AnswerStream(
             request.Question,

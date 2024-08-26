@@ -11,7 +11,7 @@
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<PackageVersion>0.0.7</PackageVersion>
 	<PackageReleaseNotes>
-	  - 移除与大模型无关的参数类型和结果
+		- 新增ApiClientBase，方便调用类的封装
 	</PackageReleaseNotes>
   </PropertyGroup>
 
