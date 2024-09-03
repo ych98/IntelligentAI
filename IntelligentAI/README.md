@@ -96,6 +96,6 @@ botAnswer = streamingContentBuilder.ToString();
 
 ```CSharp 
 
-var answer = await _model.AnswerTextByPromptAsync(promptId, replaces, 6, cancellationToken);
+var answer = await _model.AnswerTextByPromptAsync(promptId, replaces, model, cancellationToken);
 
 ```
