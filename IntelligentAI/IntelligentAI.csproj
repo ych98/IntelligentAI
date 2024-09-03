@@ -9,9 +9,10 @@
 	<Description>智能问答业务封装</Description>
 	<Platforms>AnyCPU;x86;x64</Platforms>
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
-	<PackageVersion>0.0.7</PackageVersion>
+	<PackageVersion>0.0.8</PackageVersion>
 	<PackageReleaseNotes>
-		- 新增ApiClientBase，方便调用类的封装
+		- 创建大模型时如果 ServiceKey 不可用，返回 InvalidOperationException		
+		- 参数序列化保留中文字符
 	</PackageReleaseNotes>
   </PropertyGroup>
 

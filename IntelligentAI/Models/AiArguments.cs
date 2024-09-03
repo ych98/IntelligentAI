@@ -1,7 +1,5 @@
 ﻿
 using IntelligentAI.Records.Universal;
-using Microsoft.Extensions.Options;
-using System.Xml.Linq;
 
 namespace IntelligentAI.Models;
 
@@ -162,7 +160,13 @@ public class AiArguments
 
     public override string ToString()
     {
-        var json = System.Text.Json.JsonSerializer.Serialize(this);
+        var options = new System.Text.Json.JsonSerializerOptions
+        {
+            Encoder = System.Text.Encodings.Web.JavaScriptEncoder.Create(System.Text.Unicode.UnicodeRanges.All),
+            WriteIndented = true
+        };
+
+        var json = System.Text.Json.JsonSerializer.Serialize(this, options);
 
         return json;
     }
