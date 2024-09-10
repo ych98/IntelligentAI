@@ -53,7 +53,7 @@ public static class AiModelFactoryServiceCollectionExtensions
     {
         if (_modelFactories.TryGetValue(serviceKey, out var factory)) return factory(serviceProvider);
 
-        throw new KeyNotFoundException($"未找到指定的模型实例：{serviceKey}。");
+        throw new InvalidOperationException($"'{serviceKey}' 不是 ServiceKey 的有效值，请确保参数的有效性");
     }
 }
 

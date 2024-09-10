@@ -157,4 +157,17 @@ public class AiArguments
     {
         return !(left == right);
     }
+
+    public override string ToString()
+    {
+        var options = new System.Text.Json.JsonSerializerOptions
+        {
+            Encoder = System.Text.Encodings.Web.JavaScriptEncoder.Create(System.Text.Unicode.UnicodeRanges.All),
+            WriteIndented = true
+        };
+
+        var json = System.Text.Json.JsonSerializer.Serialize(this, options);
+
+        return json;
+    }
 }

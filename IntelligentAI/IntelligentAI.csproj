@@ -9,9 +9,11 @@
 	<Description>智能问答业务封装</Description>
 	<Platforms>AnyCPU;x86;x64</Platforms>
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
-	<PackageVersion>0.0.7</PackageVersion>
+	<PackageVersion>0.0.8</PackageVersion>
 	<PackageReleaseNotes>
-	  - 移除与大模型无关的参数类型和结果
+		- 创建大模型时如果 ServiceKey 不可用，返回 InvalidOperationException		
+		- 参数序列化保留中文字符
+		- 去除无关的工具类
 	</PackageReleaseNotes>
   </PropertyGroup>
 

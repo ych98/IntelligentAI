@@ -167,7 +167,12 @@ public class FanewsAiModel : AiModelBase
                 }
             }
 
-            url = (int)parameters["apiVersion"] == 2 ? "/FanAIWeb/qaByStream2" : "/FanAIWeb/qaByStream";
+            url = "/FanAIWeb/qaByStream";
+
+            if (parameters.TryGetValue("apiVersion", out var api))
+            {
+                url = (int)api == 2 ? "/FanAIWeb/qaByStream2" : "/FanAIWeb/qaByStream";
+            }
         }
 
         #endregion
