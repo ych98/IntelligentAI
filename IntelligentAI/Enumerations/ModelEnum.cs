@@ -15,6 +15,7 @@ public class ModelEnum : Enumeration
     public const string KimiService = "Kimi";
     public const string GoogleService = "Google";
     public const string AliyunService = "Aliyun";
+    public const string AzureService = "Azure";
 
     // 抖音
     public const string HuoshanService = "Huoshan";
@@ -88,7 +89,8 @@ public class ModelEnum : Enumeration
 
     public const string ErnieSpeedProCode = "ernie-speed-128k";
 
-
+    // AzureService
+    public const string Gpt4oMiniCode = "gpt-4o-mini";
 
     #endregion
 
@@ -135,6 +137,8 @@ public class ModelEnum : Enumeration
     public static ModelEnum BaiduModel = new ModelEnum(18, BaiduService, ErnieSpeedCode);
 
     public static ModelEnum BaiduProModel = new ModelEnum(19, BaiduService, ErnieSpeedProCode);
+
+    public static ModelEnum AzureMiniModel = new ModelEnum(20, AzureService, Gpt4oMiniCode);
 
     #endregion
 

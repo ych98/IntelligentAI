@@ -46,86 +46,96 @@ public static class ProgramExtensions
 
             client.Timeout = TimeSpan.FromSeconds(60);
         });
+
+        services.AddHttpClient(FanewsApiEnum.AzureService.Name, (client) =>
+        {
+            client.BaseAddress = new Uri(apis.AzureService);
+        });
+
         return services;
     }
 
     public static IServiceCollection AddAiModels(this IServiceCollection services, ApiKeys? keys)
     {
 
-        services.AddAiModel(ModelEnum.AliyunModel.Name, ModelEnum.AliyunModel.Description, (model) =>
+        services.AddAiModel(ModelEnum.AliyunModel.Name, ModelEnum.AliyunModel.Description, (option) =>
         {
-            model.ConcurrentNumber = 500;
-            model.ApiKey = keys.Aliyun;
+            option.ConcurrentNumber = 500;
+            option.ApiKey = keys.Aliyun;
         });
 
-        services.AddAiModel(ModelEnum.AliyunMaxModel.Name, ModelEnum.AliyunMaxModel.Description, (model) =>
+        services.AddAiModel(ModelEnum.AliyunMaxModel.Name, ModelEnum.AliyunMaxModel.Description, (option) =>
         {
-            model.ConcurrentNumber = 100;
-            model.ApiKey = keys.Aliyun;
+            option.ConcurrentNumber = 100;
+            option.ApiKey = keys.Aliyun;
         });
 
-        services.AddAiModel(ModelEnum.AliyunPlusModel.Name, ModelEnum.AliyunPlusModel.Description, (model) =>
+        services.AddAiModel(ModelEnum.AliyunPlusModel.Name, ModelEnum.AliyunPlusModel.Description, (option) =>
         {
-            model.ConcurrentNumber = 100;
-            model.ApiKey = keys.Aliyun;
+            option.ConcurrentNumber = 100;
+            option.ApiKey = keys.Aliyun;
         });
 
-        services.AddAiModel(ModelEnum.AliyunTurboModel.Name, ModelEnum.AliyunTurboModel.Description, (model) =>
+        services.AddAiModel(ModelEnum.AliyunTurboModel.Name, ModelEnum.AliyunTurboModel.Description, (option) =>
         {
-            model.ConcurrentNumber = 100;
-            model.ApiKey = keys.Aliyun;
+            option.ConcurrentNumber = 100;
+            option.ApiKey = keys.Aliyun;
         });
 
-        services.AddAiModel(ModelEnum.AliyunInstructModel.Name, ModelEnum.AliyunInstructModel.Description, (model) =>
+        services.AddAiModel(ModelEnum.AliyunInstructModel.Name, ModelEnum.AliyunInstructModel.Description, (option) =>
         {
-            model.ConcurrentNumber = 5;
-            model.ApiKey = keys.Aliyun;
+            option.ConcurrentNumber = 5;
+            option.ApiKey = keys.Aliyun;
         });
 
-        services.AddAiModel(ModelEnum.AliyunBaseInstructModel.Name, ModelEnum.AliyunBaseInstructModel.Description, (model) =>
+        services.AddAiModel(ModelEnum.AliyunBaseInstructModel.Name, ModelEnum.AliyunBaseInstructModel.Description, (option) =>
         {
-            model.ConcurrentNumber = 5;
-            model.ApiKey = keys.Aliyun;
-        });
-
-
-        services.AddAiModel(ModelEnum.KimiModel.Name, ModelEnum.KimiModel.Description, (model) =>
-        {
-            model.ConcurrentNumber = 1;
-            model.ApiKey = keys.Kimi;
-        });
-
-        services.AddAiModel(ModelEnum.BaiduModel.Name, ModelEnum.BaiduModel.Description, (model) =>
-        {
-            model.ConcurrentNumber = 10;
-
-            model.ApiKey = keys.Baidu;
-        });
-
-        services.AddAiModel(ModelEnum.BaiduProModel.Name, ModelEnum.BaiduProModel.Description, (model) =>
-        {
-            model.ConcurrentNumber = 3;
-
-            model.ApiKey = keys.Baidu;
+            option.ConcurrentNumber = 5;
+            option.ApiKey = keys.Aliyun;
         });
 
 
-        services.AddAiModel(ModelEnum.GLM3Model.Name, ModelEnum.GLM3Model.Description, (model) =>
+        services.AddAiModel(ModelEnum.KimiModel.Name, ModelEnum.KimiModel.Description, (option) =>
         {
-            model.ConcurrentNumber = 60;
-            model.ApiKey = keys.Huoshan;
+            option.ConcurrentNumber = 1;
+            option.ApiKey = keys.Kimi;
         });
 
-        services.AddAiModel(ModelEnum.MistralModel.Name, ModelEnum.MistralModel.Description, (model) =>
+        services.AddAiModel(ModelEnum.BaiduModel.Name, ModelEnum.BaiduModel.Description, (option) =>
         {
-            model.ConcurrentNumber = 60;
-            model.ApiKey = keys.Huoshan;
+            option.ConcurrentNumber = 10;
+
+            option.ApiKey = keys.Baidu;
         });
 
-        services.AddAiModel(ModelEnum.Llama3Model.Name, ModelEnum.Llama3Model.Description, (model) =>
+        services.AddAiModel(ModelEnum.BaiduProModel.Name, ModelEnum.BaiduProModel.Description, (option) =>
         {
-            model.ConcurrentNumber = 60;
-            model.ApiKey = keys.Huoshan;
+            option.ConcurrentNumber = 3;
+
+            option.ApiKey = keys.Baidu;
+        });
+
+        services.AddAiModel(ModelEnum.AzureMiniModel.Name, ModelEnum.AzureMiniModel.Description, (option) =>
+        {
+            option.ApiKey = keys.Azure;
+        });
+
+        services.AddAiModel(ModelEnum.GLM3Model.Name, ModelEnum.GLM3Model.Description, (option) =>
+        {
+            option.ConcurrentNumber = 60;
+            option.ApiKey = keys.Huoshan;
+        });
+
+        services.AddAiModel(ModelEnum.MistralModel.Name, ModelEnum.MistralModel.Description, (option) =>
+        {
+            option.ConcurrentNumber = 60;
+            option.ApiKey = keys.Huoshan;
+        });
+
+        services.AddAiModel(ModelEnum.Llama3Model.Name, ModelEnum.Llama3Model.Description, (option) =>
+        {
+            option.ConcurrentNumber = 60;
+            option.ApiKey = keys.Huoshan;
         });
 
         services.AddSingleton<IAiModelEventManager, AiModelEventManager>();

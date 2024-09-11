@@ -29,11 +29,6 @@ public abstract class AiModelBase : ApiBase
 
     }
 
-    public AiModelBase() : base()
-    {
-
-    }
-
     #endregion
 
     public abstract Task<string> AnswerText(
@@ -65,3 +60,10 @@ public abstract class AiModelBase : ApiBase
     
 }
 
+
+public class AiModelOption
+{
+    public int ConcurrentNumber { get; set; }
+
+    public string? ApiKey { get; set; }
+}

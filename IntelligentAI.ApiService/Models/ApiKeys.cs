@@ -9,5 +9,8 @@ public class ApiKeys
     public string OpenAI { get; set; }
 
     public string Huoshan { get; set; }
+
     public string Baidu { get; set; }
+
+    public string Azure { get; set; }
 }

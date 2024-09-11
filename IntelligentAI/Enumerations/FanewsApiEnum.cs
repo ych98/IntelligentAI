@@ -26,14 +26,15 @@ public class FanewsApiEnum : Enumeration
 
     public static FanewsApiEnum EsFullService = new FanewsApiEnum(8, nameof(EsFullService), "关系图谱服务");
 
-
     public static FanewsApiEnum KimiService = new FanewsApiEnum(21, nameof(KimiService), "Kimi服务");
 
     public static FanewsApiEnum AliyunService = new FanewsApiEnum(31, nameof(AliyunService), "Aliyun服务");
 
     public static FanewsApiEnum HuoshanService = new FanewsApiEnum(41, nameof(HuoshanService), "火山引擎服务");
 
-    public static FanewsApiEnum BaiduService = new FanewsApiEnum(51, nameof(HuoshanService), "百度千帆大模型服务");
+    public static FanewsApiEnum BaiduService = new FanewsApiEnum(51, nameof(BaiduService), "百度千帆大模型服务");
+
+    public static FanewsApiEnum AzureService = new FanewsApiEnum(61, nameof(AzureService), "微软大模型服务");
 
 
     public FanewsApiEnum(int id, string name, string description) : base(id, name, description) { }

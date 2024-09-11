@@ -11,4 +11,6 @@ public class ModelApis
     public string HuoshanService { get; set; }
 
     public string BaiduService { get; set; }
+
+    public string AzureService { get; set; }
 }

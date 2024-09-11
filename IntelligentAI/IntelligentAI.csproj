@@ -9,15 +9,14 @@
 	<Description>智能问答业务封装</Description>
 	<Platforms>AnyCPU;x86;x64</Platforms>
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
-	<PackageVersion>0.0.8</PackageVersion>
+	<PackageVersion>0.1.0-beta</PackageVersion>
 	<PackageReleaseNotes>
-		- 创建大模型时如果 ServiceKey 不可用，返回 InvalidOperationException		
-		- 参数序列化保留中文字符
-		- 去除无关的工具类
+		- 新增 Azure OpenAI 适配
 	</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Azure.AI.OpenAI" Version="2.0.0-beta.5" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
   </ItemGroup>
 	
