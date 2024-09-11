@@ -71,9 +71,6 @@ public class AzureModel : AiModelBase
 
         #endregion
 
-        // 转换为大模型传入参数
-        Dictionary<string, object> formatParameters = GetParameters(nameof(AnswerText), parameters);
-
         var messageList = new List<ChatMessage>()
         {
             new SystemChatMessage(
@@ -97,7 +94,7 @@ public class AzureModel : AiModelBase
             }
         }
 
-        var client = _httpClientFactory.CreateClient(FanewsApiEnum.AzureService.Name);
+        var client = _httpClientFactory.CreateClient(ApiEnum.AzureService.Name);
 
         AzureOpenAIClient azureClient = new(
             client.BaseAddress,
@@ -105,7 +102,7 @@ public class AzureModel : AiModelBase
 
         ChatClient chatClient = azureClient.GetChatClient(model.Description);
 
-        ChatCompletion completion = chatClient.CompleteChat(
+        ChatCompletion completion = await chatClient.CompleteChatAsync(
             messageList.Append(new UserChatMessage(HtmlUtilities.GetHtmlValue(TextUtilities.EscapePattern(question)) + "\n\n" + promptContent)));
 
         return completion.Content.FirstOrDefault()?.Text;
@@ -168,9 +165,6 @@ public class AzureModel : AiModelBase
 
         #endregion
 
-        // 转换为大模型传入参数
-        Dictionary<string, object> formatParameters = GetParameters(nameof(AnswerText), parameters);
-
         var messageList = new List<ChatMessage>()
         {
             new SystemChatMessage(
@@ -194,7 +188,7 @@ public class AzureModel : AiModelBase
             }
         }
 
-        var client = _httpClientFactory.CreateClient(FanewsApiEnum.AzureService.Name);
+        var client = _httpClientFactory.CreateClient(ApiEnum.AzureService.Name);
        
         AzureOpenAIClient azureClient = new(
             client.BaseAddress,
@@ -232,114 +226,8 @@ public class AzureModel : AiModelBase
         Dictionary<string, object>? overrides = null,
         MissingKeyBehavior missingKeyBehavior = MissingKeyBehavior.Ignore)
     {
-        Dictionary<string, object> parameters = method switch
-        {
-            nameof(AnswerText) => new Dictionary<string, object>
-                {
-                    // Aliyun chat 接口参数
-                    {"model", "qwen-long"},
-                    {"input",new Dictionary<string, object>
-                        {
-                            {"messages", new List<Records.Universal.Message>()}
-                        }},
-                    {"parameters", new Dictionary<string, object>
-                        {
-                            {"result_format", "message"}
-                        }}
-                },
-            nameof(AnswerStream) => new Dictionary<string, object>
-                {
-                    // Aliyun chat 接口参数
-                    {"model", "qwen-long"},
-                    {"input", new Dictionary<string, object>
-                        {
-                            {"messages", new List<Records.Universal.Message>()}
-                        }},
-                    {"parameters", new Dictionary<string, object>
-                        {
-                            {"incremental_output", true},
-                            {"result_format", "message"}
-                        }}
-                },
-            _ => throw new ArgumentException($"Unknown method: {method}")
-        };
-
-        if (overrides is null || overrides.Count == 0) return parameters;
-
-        // 获取当前方法的键映射
-        var currentMethodKeyMappings = MethodKeyMappings is not null && MethodKeyMappings.ContainsKey(method)
-            ? MethodKeyMappings[method]
-            : null;
-
-        foreach (var kvp in overrides)
-        {
-            // 检查是否存在映射关系
-            string keyToUse = currentMethodKeyMappings is not null && currentMethodKeyMappings.ContainsKey(kvp.Key)
-                ? currentMethodKeyMappings[kvp.Key] :
-                kvp.Key;
-
-            // 如果键存在于默认参数中，或者行为是追加，则处理键值对
-            if (parameters.ContainsKey(keyToUse) || missingKeyBehavior == MissingKeyBehavior.Append)
-            {
-                parameters[keyToUse] = kvp.Value;
-            }
-            else if (missingKeyBehavior == MissingKeyBehavior.Error)
-            {
-                // 如果键不存在于默认参数中，且行为是报错，则抛出异常
-                throw new ArgumentException($"Key not found: {kvp.Key}");
-            }
-            // 如果行为是忽略，则不做任何操作
-        }
+        Dictionary<string, object> parameters = new Dictionary<string, object>();
 
         return parameters;
-    }
-
-    // 存储每个方法的键映射关系 接口输入参数名称 => 传入大模型参数名称
-    private Dictionary<string, Dictionary<string, string>> MethodKeyMappings => new Dictionary<string, Dictionary<string, string>>    {
-        {
-            nameof(AnswerText), new Dictionary<string, string>
-            {
-                {"topP", "top_p"}
-            }
-        },
-        {
-            nameof(AnswerStream), new Dictionary<string, string>
-            {
-                {"topP", "top_p"}
-            }
-        }
-    };
-
-
-    private Dictionary<string, string> AdditionalHeaders(bool stream)
-    {
-        return ModelName switch
-        {
-            ModelEnum.AliLongCode => new Dictionary<string, string>()
-            {
-                ["X-DashScope-SSE"] = stream ? "enable" : "disable",
-                ["X-DashScope-DataInspection"] = "{\"input\":\"disable\", \"output\":\"disable\"}"
-            },
-            ModelEnum.AliPlusCode => new Dictionary<string, string>()
-            {
-                ["X-DashScope-SSE"] = stream ? "enable" : "disable",
-                ["X-DashScope-DataInspection"] = "{\"input\":\"disable\", \"output\":\"disable\"}"
-            },
-            ModelEnum.AliTurboCode => new Dictionary<string, string>()
-            {
-                ["X-DashScope-SSE"] = stream ? "enable" : "disable",
-                ["X-DashScope-DataInspection"] = "{\"input\":\"disable\", \"output\":\"disable\"}"
-            },
-            ModelEnum.AliMaxCode => new Dictionary<string, string>()
-            {
-                ["X-DashScope-SSE"] = stream ? "enable" : "disable",
-                ["X-DashScope-DataInspection"] = "{\"input\":\"disable\", \"output\":\"disable\"}"
-            },
-            _ => new Dictionary<string, string>()
-            {
-                ["X-DashScope-SSE"] = stream ? "enable" : "disable"
-            }
-        };
-
     }
 }

@@ -36,9 +36,9 @@ public class ApiBase
     protected virtual async Task<TOut> CallApiAsync<TOut>(string service, string url, Dictionary<string, object> args, CancellationToken cancellation = default)
     {
         // 校验 Api 服务名称
-        var api = Enumeration.FromName<FanewsApiEnum>(service);
+        // var api = Enumeration.FromName<ApiEnum>(service);
 
-        using (HttpClient client = _httpClientFactory.CreateClient(api.Name))
+        using (HttpClient client = _httpClientFactory.CreateClient(service))
         {
             // 将字典转换为键值对集合
             var keyValuePairs = args.Select(kv => new KeyValuePair<string, string>(kv.Key, kv.Value?.ToString()));
@@ -70,9 +70,9 @@ public class ApiBase
     protected virtual async IAsyncEnumerable<TOut> CallStreamApiAsync<TOut>(string service, string url, Dictionary<string, object> args, [EnumeratorCancellation] CancellationToken cancellation)
     {
         // 校验 Api 服务名称
-        var api = Enumeration.FromName<FanewsApiEnum>(service);
+        // var api = Enumeration.FromName<ApiEnum>(service);
 
-        using (HttpClient client = _httpClientFactory.CreateClient(api.Name))
+        using (HttpClient client = _httpClientFactory.CreateClient(service))
         {
             var request = new HttpRequestMessage(HttpMethod.Post, url);
 
@@ -139,9 +139,9 @@ public class ApiBase
         CancellationToken cancellation = default)
     {
         // 校验 Api 服务名称
-        var api = Enumeration.FromName<FanewsApiEnum>(service);
+        // var api = Enumeration.FromName<ApiEnum>(service);
 
-        using (HttpClient client = _httpClientFactory.CreateClient(api.Name))
+        using (HttpClient client = _httpClientFactory.CreateClient(service))
         {
             if (!string.IsNullOrWhiteSpace(bearer))
             {
@@ -192,9 +192,9 @@ public class ApiBase
         CancellationToken cancellation = default)
     {
         // 校验 Api 服务名称
-        var api = Enumeration.FromName<FanewsApiEnum>(service);
+        // var api = Enumeration.FromName<ApiEnum>(service);
 
-        using (HttpClient client = _httpClientFactory.CreateClient(api.Name))
+        using (HttpClient client = _httpClientFactory.CreateClient(service))
         {
             if (!string.IsNullOrWhiteSpace(bearer))
             {
@@ -269,9 +269,9 @@ public class ApiBase
         CancellationToken cancellation = default)
     {
         // 校验 Api 服务名称
-        var api = Enumeration.FromName<FanewsApiEnum>(service);
+        // var api = Enumeration.FromName<ApiEnum>(service);
 
-        using (HttpClient client = _httpClientFactory.CreateClient(api.Name))
+        using (HttpClient client = _httpClientFactory.CreateClient(service))
         {
             if (!string.IsNullOrWhiteSpace(bearer))
             {
@@ -340,9 +340,9 @@ public class ApiBase
         [EnumeratorCancellation] CancellationToken cancellation = default)
     {
         // 校验 Api 服务名称
-        var api = Enumeration.FromName<FanewsApiEnum>(service);
+        // var api = Enumeration.FromName<ApiEnum>(service);
 
-        using (HttpClient client = _httpClientFactory.CreateClient(api.Name))
+        using (HttpClient client = _httpClientFactory.CreateClient(service))
         {
             if (!string.IsNullOrWhiteSpace(bearer))
             {
@@ -412,9 +412,9 @@ public class ApiBase
         [EnumeratorCancellation] CancellationToken cancellation = default)
     {
         // 校验 Api 服务名称
-        var api = Enumeration.FromName<FanewsApiEnum>(service);
+        // var api = Enumeration.FromName<ApiEnum>(service);
 
-        using (HttpClient client = _httpClientFactory.CreateClient(api.Name))
+        using (HttpClient client = _httpClientFactory.CreateClient(service))
         {
             if (!string.IsNullOrWhiteSpace(bearer))
             {
@@ -484,9 +484,9 @@ public class ApiBase
         [EnumeratorCancellation] CancellationToken cancellation = default)
     {
         // 校验 Api 服务名称
-        var api = Enumeration.FromName<FanewsApiEnum>(service);
+        // var api = Enumeration.FromName<ApiEnum>(service);
 
-        using (HttpClient client = _httpClientFactory.CreateClient(api.Name))
+        using (HttpClient client = _httpClientFactory.CreateClient(service))
         {
             if (!string.IsNullOrWhiteSpace(bearer))
             {

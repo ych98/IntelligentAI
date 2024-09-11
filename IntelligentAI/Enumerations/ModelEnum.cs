@@ -10,7 +10,6 @@ public class ModelEnum : Enumeration
 {
     #region 服务公司名称
 
-    public const string FanewsService = "Fanews";
     public const string OpenAIService = "OpenAI";
     public const string KimiService = "Kimi";
     public const string GoogleService = "Google";
@@ -26,33 +25,9 @@ public class ModelEnum : Enumeration
 
     #region 模型型号
 
-    #region FanewsService
-
-    // 已弃用
-
-    public const string ShushengModelCode = "internlm2-chat-7b";
-
-    public const string AliMaxModelCode = "qwen:14b";
-
-    public const string AliProModelCode = "qwen:32b";
-
-    // 转发
-    public const string AliDefaultModelCode = "Qwen-14B-Chat-Int4";
-
-    // 使用中
-    public const string AliModelCode = "qwen2:7b";
-
-    public const string AliProMaxModelCode = "qwen2:72b";
-
-    public const string DeepseekModelCode = "deepseek-v2";
-
-    public const string GoogleModelCode = "gemma2:27b";
-
-    #endregion
-
     // OpenAIService
 
-    public const string OpenAICode = "gpt-4";
+    public const string Gpt4Code = "gpt-4";
 
     public const string Gpt4oCode = "gpt-4o";
 
@@ -94,30 +69,6 @@ public class ModelEnum : Enumeration
 
     #endregion
 
-    #region 01-10为 Fanews 内部已封装接口
-
-    public static ModelEnum Fanews = new ModelEnum(1, FanewsService, "知识库问答");
-
-    public static ModelEnum GoogleAiModel = new ModelEnum(2, FanewsService, GoogleModelCode);
-
-    public static ModelEnum AliDefaultModel = new ModelEnum(3, FanewsService, AliDefaultModelCode);
-
-    public static ModelEnum DeepseekModel = new ModelEnum(4, FanewsService, DeepseekModelCode);
-
-    public static ModelEnum AliOnlineInstructModel = new ModelEnum(5, FanewsService, AliInstructCode);
-
-    public static ModelEnum AliOnlineLongModel = new ModelEnum(6, FanewsService, AliLongCode);
-
-    public static ModelEnum AliModel = new ModelEnum(7, FanewsService, AliModelCode);
-
-    //public static ModelEnum AliMaxModel = new ModelEnum(8, FanewsService, AliMaxModelCode);
-
-    //public static ModelEnum AliProModel = new ModelEnum(9, FanewsService, AliProModelCode);
-
-    public static ModelEnum AliProMaxModel = new ModelEnum(10, FanewsService, AliProMaxModelCode);
-
-    #endregion
-
     #region 11-20为国内大模型接口
 
     public static ModelEnum KimiModel = new ModelEnum(11, KimiService, MoonshotCode);
@@ -144,7 +95,7 @@ public class ModelEnum : Enumeration
 
     #region 21-30为国外大模型接口
 
-    public static ModelEnum OpenAIModel = new ModelEnum(20, OpenAIService, OpenAICode);
+    public static ModelEnum OpenAIModel = new ModelEnum(20, OpenAIService, Gpt4Code);
 
     public static ModelEnum Gpt4oModel = new ModelEnum(21, OpenAIService, Gpt4oCode);
 

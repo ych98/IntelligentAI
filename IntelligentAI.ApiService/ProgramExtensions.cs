@@ -9,7 +9,7 @@ public static class ProgramExtensions
 {
     public static IServiceCollection AddHttpClients(this IServiceCollection services, ModelApis? apis)
     {
-        services.AddHttpClient(FanewsApiEnum.KimiService.Name, (client) =>
+        services.AddHttpClient(ApiEnum.KimiService.Name, (client) =>
         {
             client.BaseAddress = new Uri(apis.KimiService);
 
@@ -19,7 +19,7 @@ public static class ProgramExtensions
 
         });
 
-        services.AddHttpClient(FanewsApiEnum.HuoshanService.Name, (client) =>
+        services.AddHttpClient(ApiEnum.HuoshanService.Name, (client) =>
         {
             client.BaseAddress = new Uri(apis.HuoshanService);
 
@@ -29,7 +29,7 @@ public static class ProgramExtensions
 
         });
 
-        services.AddHttpClient(FanewsApiEnum.AliyunService.Name, (client) =>
+        services.AddHttpClient(ApiEnum.AliyunService.Name, (client) =>
         {
             client.BaseAddress = new Uri(apis.AliyunService);
 
@@ -38,7 +38,7 @@ public static class ProgramExtensions
             client.Timeout = TimeSpan.FromSeconds(60);
         });
 
-        services.AddHttpClient(FanewsApiEnum.BaiduService.Name, (client) =>
+        services.AddHttpClient(ApiEnum.BaiduService.Name, (client) =>
         {
             client.BaseAddress = new Uri(apis.BaiduService);
 
@@ -47,7 +47,7 @@ public static class ProgramExtensions
             client.Timeout = TimeSpan.FromSeconds(60);
         });
 
-        services.AddHttpClient(FanewsApiEnum.AzureService.Name, (client) =>
+        services.AddHttpClient(ApiEnum.AzureService.Name, (client) =>
         {
             client.BaseAddress = new Uri(apis.AzureService);
         });

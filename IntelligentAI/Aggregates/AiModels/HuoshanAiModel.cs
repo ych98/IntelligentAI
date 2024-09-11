@@ -71,7 +71,7 @@ public class HuoshanAiModel : AiModelBase
 
         formatParameters["model"] = model.Description;
 
-        var aiResult = await CallAsync<Records.Kimi.KimiResult>(FanewsApiEnum.HuoshanService.Name, "/api/v3/chat/completions", formatParameters, ApiKey,cancellation: cancellation);
+        var aiResult = await CallAsync<Records.Kimi.KimiResult>(ApiEnum.HuoshanService.Name, "/api/v3/chat/completions", formatParameters, ApiKey,cancellation: cancellation);
 
         return aiResult.Choices.FirstOrDefault().Message.Content;
     }
@@ -135,7 +135,7 @@ public class HuoshanAiModel : AiModelBase
 
         formatParameters["model"] = ConvertToModelName(model.Description);
 
-        await foreach (var message in CallStreamAsync<string>(FanewsApiEnum.HuoshanService.Name, "/api/v3/chat/completions", formatParameters, ApiKey, cancellation: cancellation))
+        await foreach (var message in CallStreamAsync<string>(ApiEnum.HuoshanService.Name, "/api/v3/chat/completions", formatParameters, ApiKey, cancellation: cancellation))
         {
             // 处理v2版本的接口返回内容
             string pattern = @"""content"":\s*""([^""]*)""";

@@ -20,7 +20,7 @@ public class AiModelService : ApiBase, IAiModelService
         string url = $"/Ai/AnswerModels";
 
         return await GetAsync<IEnumerable<ModelEnum>>(
-            FanewsApiEnum.FanewsIntelligence.Name,
+            "Intelligence",
             url,
             cancellation: cancellationToken);
     }
@@ -30,7 +30,7 @@ public class AiModelService : ApiBase, IAiModelService
         string url = $"/Ai/AnswerModels";
 
         var models = await GetAsync<IEnumerable<ModelEnum>>(
-            FanewsApiEnum.FanewsIntelligence.Name,
+            "Intelligence",
             url,
             cancellation: cancellationToken);
 
@@ -42,7 +42,7 @@ public class AiModelService : ApiBase, IAiModelService
         string url = $"/Ai/AnswerModels";
 
         var models = await GetAsync<IEnumerable<ModelEnum>>(
-            FanewsApiEnum.FanewsIntelligence.Name,
+            "Intelligence",
             url,
             cancellation: cancellationToken);
 
@@ -60,7 +60,7 @@ public class AiModelService : ApiBase, IAiModelService
         string url = $"/Ai/AnswerText?modelEnum={modelEnum}";
 
         return await CallAsync<AiArguments, string>(
-            FanewsApiEnum.FanewsIntelligence.Name,
+            "Intelligence",
             url,
             arguments,
             cancellation: cancellationToken);
@@ -75,7 +75,7 @@ public class AiModelService : ApiBase, IAiModelService
         string url = $"/Ai/AnswerStream?modelEnum={modelEnum}";
 
         await foreach (var message in CallStreamAsync<AiArguments, string>(
-            FanewsApiEnum.FanewsIntelligence.Name,
+            "Intelligence",
             url,
             arguments,
             cancellation: cancellationToken))
@@ -92,7 +92,7 @@ public class AiModelService : ApiBase, IAiModelService
         string url = $"/Ai/AnswerStrings?modelEnum={modelEnum}";
 
         await foreach (var message in CallStringsAsync<AiArguments, string>(
-            FanewsApiEnum.FanewsIntelligence.Name,
+            "Intelligence",
             url,
             arguments,
             cancellation: cancellationToken))
@@ -109,7 +109,7 @@ public class AiModelService : ApiBase, IAiModelService
         string url = $"/AiManager/AnswerProgress?modelEnum={modelEnum}";
 
         await foreach (var message in CallStringsAsync<List<AiArguments>, AiProgressResult>(
-            FanewsApiEnum.FanewsIntelligence.Name,
+            "Intelligence",
             url,
             requests,
             cancellation: cancellation))
@@ -120,126 +120,13 @@ public class AiModelService : ApiBase, IAiModelService
 
     #endregion
 
-    #region Prompt
-
-    public async Task<string> GetPromptAsync(string id, CancellationToken cancellation = default)
-    {
-        string url = $"/Business/GetPrompt?id={id}";
-
-        return await GetAsync<string>(
-            FanewsApiEnum.FanewsIntelligence.Name,
-            url,
-            cancellation: cancellation);
-    }
-
-
-    public async Task<string> GetPromptAsync(
-        string id, 
-        Dictionary<string, string>? replaces, 
-        CancellationToken cancellation = default)
-    {
-        string url = $"/FanewsBusiness/GetPrompt?id={id}";
-
-        return await CallAsync<Dictionary<string, string>, string>(
-            FanewsApiEnum.FanewsIntelligence.Name,
-            url,
-            replaces,
-            cancellation: cancellation);
-    }
-
-    #endregion
-
-    #region Utility
-
-    public async Task<string[]> DeduplicateAsync(string[] strings, string methodName = "NormalizedLevenshtein", double similarityThreshold = 0.6, CancellationToken cancellation = default)
-    {
-        string url = $"/Text/Deduplicate?methodName={methodName}&similarityThreshold={similarityThreshold}";
-
-        return await CallAsync<string[], string[]>(
-            FanewsApiEnum.FanewsIntelligence.Name,
-            url,
-            strings,
-            cancellation: cancellation);
-    }
-
-    public async Task<string[]> GetContentsAsync(string html, CancellationToken cancellation = default)
-    {
-        string url = $"/Html/GetTextArray";
-
-        return await CallAsync<string, string[]>(
-            FanewsApiEnum.FanewsIntelligence.Name,
-            url,
-            html,
-            cancellation: cancellation);
-    }
-
-    #endregion
-
-    #region Business
-
-    public async Task<string> AnswerTextByPromptAsync(
-        string id,
-        Dictionary<string, string>? replaces,
-        int modelEnum = 12,
-        CancellationToken cancellation = default)
-    {
-        string url = $"/FanewsBusiness/GetPrompt?id={id}";
-
-        var question = await CallAsync<Dictionary<string, string>, string>(
-            FanewsApiEnum.FanewsIntelligence.Name,
-            url,
-            replaces,
-            cancellation: cancellation);
-
-        url = $"/Ai/AnswerText?modelEnum={modelEnum}";
-
-        AiArguments arguments = new AiArguments(question);
-
-        return await CallAsync<AiArguments, string>(
-            FanewsApiEnum.FanewsIntelligence.Name,
-            url,
-            arguments,
-            cancellation: cancellation);
-    }
-
-    public async IAsyncEnumerable<string> AnswerStringsByPromptAsync(
-        string id,
-        Dictionary<string, string>? replaces,
-        int modelEnum = 12,
-        [EnumeratorCancellation] CancellationToken cancellation = default)
-    {
-        string url = $"/FanewsBusiness/GetPrompt?id={id}";
-
-        var question = await CallAsync<Dictionary<string, string>, string>(
-            FanewsApiEnum.FanewsIntelligence.Name,
-            url,
-            replaces,
-            cancellation: cancellation);
-
-        url = $"/Ai/AnswerStrings?modelEnum={modelEnum}";
-
-        AiArguments arguments = new AiArguments(question);
-
-        await foreach (var message in CallStringsAsync<AiArguments, string>(
-            FanewsApiEnum.FanewsIntelligence.Name,
-            url,
-            arguments,
-            cancellation: cancellation))
-        {
-            yield return message;
-        }
-
-    }
-
-    #endregion
-
 }
 
 public static class SdkBuilderExtensions
 {
     public static IServiceCollection AddAiService(this IServiceCollection services, AiOptions options)
     {
-        services.AddHttpClient(FanewsApiEnum.FanewsIntelligence.Name, (client) =>
+        services.AddHttpClient("Intelligence", (client) =>
         {
             client.BaseAddress = new Uri(options.Address);
             client.Timeout = TimeSpan.FromSeconds(options.TimeoutSeconds);

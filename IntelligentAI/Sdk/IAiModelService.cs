@@ -37,43 +37,4 @@ public interface IAiModelService
         CancellationToken cancellation = default);
 
     #endregion
-
-    #region Prompt
-    Task<string> GetPromptAsync(
-        string id,
-        CancellationToken cancellation = default);
-
-    Task<string> GetPromptAsync(
-        string id,
-        Dictionary<string, string>? replaces,
-        CancellationToken cancellation = default);
-
-    Task<string> AnswerTextByPromptAsync(
-        string id,
-        Dictionary<string, string>? replaces,
-        int modelEnum = 12,
-        CancellationToken cancellation = default);
-
-    IAsyncEnumerable<string> AnswerStringsByPromptAsync(
-        string id,
-        Dictionary<string, string>? replaces,
-        int modelEnum = 12,
-        CancellationToken cancellation = default);
-    #endregion
-
-    #region Utility
-    Task<string[]> DeduplicateAsync(
-    string[] strings,
-    string methodName = "NormalizedLevenshtein",
-    double similarityThreshold = 0.6,
-    CancellationToken cancellation = default);
-
-    Task<string[]> GetContentsAsync(
-        string html,
-        CancellationToken cancellation = default);
-    #endregion
-
-    #region Business
-
-    #endregion
 }

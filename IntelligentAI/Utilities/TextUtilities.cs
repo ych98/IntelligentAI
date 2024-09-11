@@ -80,7 +80,7 @@ public static class TextUtilities
         };
 
     // 使用 AES 加密算法加密密码
-    public static string EncryptPassword(string password, string key = "Fanews@123", string iv = "cnfanews")
+    public static string EncryptPassword(string password, string key = "Random@123", string iv = "random")
     {
         if (string.IsNullOrWhiteSpace(password)) return string.Empty;
 
@@ -93,7 +93,7 @@ public static class TextUtilities
     }
 
     // 使用 AES 加密算法解密密码
-    public static string DecryptPassword(string encryptedPassword, string key = "Fanews@123", string iv = "cnfanews")
+    public static string DecryptPassword(string encryptedPassword, string key = "Random@123", string iv = "random")
     {
         if (string.IsNullOrWhiteSpace(encryptedPassword)) return string.Empty;
 

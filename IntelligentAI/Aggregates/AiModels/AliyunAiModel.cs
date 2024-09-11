@@ -99,7 +99,7 @@ public class AliyunAiModel : AiModelBase
         var headers = AdditionalHeaders(stream: false);
 
 
-        var aiResult = await CallAsync<Records.Aliyun.AliyunResult>(FanewsApiEnum.AliyunService.Name, "/api/v1/services/aigc/text-generation/generation", formatParameters, ApiKey, additionalHeaders: headers, cancellation: cancellation);
+        var aiResult = await CallAsync<Records.Aliyun.AliyunResult>(ApiEnum.AliyunService.Name, "/api/v1/services/aigc/text-generation/generation", formatParameters, ApiKey, additionalHeaders: headers, cancellation: cancellation);
 
         return aiResult.Output.Choices.FirstOrDefault().Message.Content;
     }
@@ -186,7 +186,7 @@ public class AliyunAiModel : AiModelBase
         var headers = AdditionalHeaders(stream: true);
 
         await foreach (var single in CallStreamAsync<string>(
-            FanewsApiEnum.AliyunService.Name, 
+            ApiEnum.AliyunService.Name, 
             "/api/v1/services/aigc/text-generation/generation", 
             formatParameters, 
             ApiKey, 

@@ -74,7 +74,7 @@ public class KimiAiModel : AiModelBase
 
         formatParameters["model"] = model.Description;
 
-        var aiResult = await CallAsync<Records.Kimi.KimiResult>(FanewsApiEnum.KimiService.Name, "/v1/chat/completions", formatParameters, ApiKey,cancellation: cancellation);
+        var aiResult = await CallAsync<Records.Kimi.KimiResult>(ApiEnum.KimiService.Name, "/v1/chat/completions", formatParameters, ApiKey,cancellation: cancellation);
 
         return aiResult.Choices.FirstOrDefault().Message.Content;
     }
@@ -139,7 +139,7 @@ public class KimiAiModel : AiModelBase
 
         formatParameters["model"] = model.Description;
 
-        await foreach (var single in CallStreamAsync<string>(FanewsApiEnum.KimiService.Name, "/v1/chat/completions", formatParameters, ApiKey, cancellation: cancellation))
+        await foreach (var single in CallStreamAsync<string>(ApiEnum.KimiService.Name, "/v1/chat/completions", formatParameters, ApiKey, cancellation: cancellation))
         {
             if (string.IsNullOrWhiteSpace(single)) continue;
 

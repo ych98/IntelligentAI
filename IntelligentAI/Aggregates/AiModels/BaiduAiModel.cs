@@ -89,12 +89,12 @@ public class BaiduAiModel : AiModelBase
 
         var secret = keys.Last().Substring(keys.Last().IndexOf("-") + 1);
 
-        var token = await GetAsync<BaiduTokenResult>(FanewsApiEnum.BaiduService.Name,
+        var token = await GetAsync<BaiduTokenResult>(ApiEnum.BaiduService.Name,
             $"/oauth/2.0/token?grant_type=client_credentials&client_id={id}&client_secret={secret}",
             cancellation: cancellation);
 
         var aiResult = await CallAsync<Records.Baidu.BaiduResult>(
-            FanewsApiEnum.BaiduService.Name,
+            ApiEnum.BaiduService.Name,
             $"/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/{modelUrl}?access_token={token.AccessToken}",
             formatParameters,
             cancellation: cancellation);
@@ -169,12 +169,12 @@ public class BaiduAiModel : AiModelBase
 
         var secret = keys.Last().Substring(keys.Last().IndexOf("-") + 1);
 
-        var token = await GetAsync<BaiduTokenResult>(FanewsApiEnum.BaiduService.Name,
+        var token = await GetAsync<BaiduTokenResult>(ApiEnum.BaiduService.Name,
             $"/oauth/2.0/token?grant_type=client_credentials&client_id={id}&client_secret={secret}",
             cancellation: cancellation);
 
         await foreach (var single in CallStreamAsync<string>(
-            FanewsApiEnum.BaiduService.Name,
+            ApiEnum.BaiduService.Name,
             $"/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/{modelUrl}?access_token={token.AccessToken}",
             formatParameters,
             cancellation: cancellation))

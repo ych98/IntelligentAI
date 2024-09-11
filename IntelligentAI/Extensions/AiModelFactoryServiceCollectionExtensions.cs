@@ -22,7 +22,6 @@ public static class AiModelFactoryServiceCollectionExtensions
 
             AiModelBase model = serviceName switch
             {
-                ModelEnum.FanewsService => new FanewsAiModel(httpClientFactory),
                 ModelEnum.AliyunService => new AliyunAiModel(httpClientFactory),
                 ModelEnum.OpenAIService => new OpenAiModel(httpClientFactory),
                 ModelEnum.GoogleService => new GoogleAiModel(httpClientFactory),
@@ -55,6 +54,32 @@ public static class AiModelFactoryServiceCollectionExtensions
         if (_modelFactories.TryGetValue(serviceKey, out var factory)) return factory(serviceProvider);
 
         throw new InvalidOperationException($"'{serviceKey}' 不是 ServiceKey 的有效值，请确保参数的有效性");
+    }
+
+    public static IServiceCollection AddCustomAiModel<TModel>(this IServiceCollection services, string serviceName, string modelName, Action<AiModelOption> setupAction)
+        where TModel : AiModelBase
+    {
+        var serviceKey = $"{serviceName}-{modelName}";
+
+        // 注册工厂方法
+        _modelFactories[serviceKey] = serviceProvider =>
+        {
+            var httpClientFactory = serviceProvider.GetRequiredService<IHttpClientFactory>();
+
+            var model = ActivatorUtilities.CreateInstance<TModel>(serviceProvider, httpClientFactory);
+
+            var modelOptions = new AiModelOption();
+            setupAction(modelOptions);
+
+            model.ServiceName = serviceName;
+            model.ModelName = modelName;
+            model.ApiKey = !string.IsNullOrWhiteSpace(modelOptions.ApiKey) ? modelOptions.ApiKey : string.Empty;
+            model.ConcurrentNumber = modelOptions.ConcurrentNumber;
+
+            return model;
+        };
+
+        return services;
     }
 }
 

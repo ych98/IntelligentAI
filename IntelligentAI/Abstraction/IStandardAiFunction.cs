@@ -1,5 +1,4 @@
-﻿using IntelligentAI.Records.Fanews;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,29 +8,8 @@ namespace IntelligentAI.Abstraction;
 
 public interface IStandardAiFunction
 {
-    #region 基础功能
-    /// <summary>
-    /// 文字生成文字
-    /// </summary>
-    /// <returns></returns>
-    Task<AiResult> AiGetTextFromTextAsync(string content, int count = 1, string type = nameof(PromptEnum.Summary), int modelEnum = 12, CancellationToken cancellation = default);
-
-    /// <summary>
-    /// 图片生成文字
-    /// </summary>
-    /// <returns></returns>
-    Task<AiResult> AiGetTextFromImageAsync(string image, int count = 1, string type = nameof(TextFromImageEnum.Content), int modelEnum = 12, CancellationToken cancellation = default);
-
-    /// <summary>
-    /// 图片生成图片
-    /// </summary>
-    /// <returns></returns>
-    Task<AiImagesResult> AiGetImageFromImageAsync(string image, string type = nameof(ImageGenerationEnum.New), int modelEnum = 12, CancellationToken cancellation = default);
-    
-    #endregion
 
     #region 独立化功能
-
 
     /// <summary>
     /// 内容生成标题

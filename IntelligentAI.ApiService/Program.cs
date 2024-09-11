@@ -1,6 +1,7 @@
 using IntelligentAI.ApiService;
 using IntelligentAI.ApiService.Models;
 using Microsoft.OpenApi.Models;
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 

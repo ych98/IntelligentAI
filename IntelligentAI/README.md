@@ -43,16 +43,9 @@ public YourClass(IAiModelService model)
 
 var request = new AiArguments("杭州西湖哪里好玩？");
 
-int model = 6;  // 编号为 6 代表阿里云在线 qwen-long 模型
+int model = 6; 
 
 var _cts = new CancellationTokenSource();
-
-var promptId = "prompt10";
-
-var replaces = new Dictionary<string, string>()
-{
-    ["正文"] = Content  // 提示词占位符替换
-};
 
 ```
 
@@ -89,13 +82,5 @@ await foreach (var message in stream)
 
 // Or you can get the full answer here
 botAnswer = streamingContentBuilder.ToString(); 
-
-```
-
-**Prompt answer**
-
-```CSharp 
-
-var answer = await _model.AnswerTextByPromptAsync(promptId, replaces, model, cancellationToken);
 
 ```

@@ -9,9 +9,10 @@
 	<Description>智能问答业务封装</Description>
 	<Platforms>AnyCPU;x86;x64</Platforms>
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
-	<PackageVersion>0.1.0-beta</PackageVersion>
+	<PackageVersion>0.1.1-beta</PackageVersion>
 	<PackageReleaseNotes>
-		- 新增 Azure OpenAI 适配
+		- ApiBase 取消 ApiEnum 校验
+		- 移除和大模型不相关的类
 	</PackageReleaseNotes>
   </PropertyGroup>
 
