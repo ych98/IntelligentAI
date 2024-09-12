@@ -95,11 +95,11 @@ public class ModelEnum : Enumeration
 
     #region 21-30为国外大模型接口
 
-    public static ModelEnum OpenAIModel = new ModelEnum(20, OpenAIService, Gpt4Code);
+    public static ModelEnum OpenAIModel = new ModelEnum(21, OpenAIService, Gpt4Code);
 
-    public static ModelEnum Gpt4oModel = new ModelEnum(21, OpenAIService, Gpt4oCode);
+    public static ModelEnum Gpt4oModel = new ModelEnum(22, OpenAIService, Gpt4oCode);
 
-    public static ModelEnum GoogleModel = new ModelEnum(25, GoogleService, GoogleCode);
+    public static ModelEnum GoogleModel = new ModelEnum(26, GoogleService, GoogleCode);
 
     #endregion
 

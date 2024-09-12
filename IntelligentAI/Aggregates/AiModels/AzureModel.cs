@@ -100,7 +100,7 @@ public class AzureModel : AiModelBase
             client.BaseAddress,
             new AzureKeyCredential(ApiKey));
 
-        ChatClient chatClient = azureClient.GetChatClient(model.Description);
+        ChatClient chatClient = azureClient.GetChatClient(ConvertToModelUrl(model.Description));
 
         ChatCompletion completion = await chatClient.CompleteChatAsync(
             messageList.Append(new UserChatMessage(HtmlUtilities.GetHtmlValue(TextUtilities.EscapePattern(question)) + "\n\n" + promptContent)));
@@ -194,7 +194,7 @@ public class AzureModel : AiModelBase
             client.BaseAddress,
             new AzureKeyCredential(ApiKey));
 
-        ChatClient chatClient = azureClient.GetChatClient(model.Description);
+        ChatClient chatClient = azureClient.GetChatClient(ConvertToModelUrl(model.Description));
 
         AsyncCollectionResult<StreamingChatCompletionUpdate> completionUpdates = chatClient.CompleteChatStreamingAsync(
             messageList.Append(
@@ -229,5 +229,14 @@ public class AzureModel : AiModelBase
         Dictionary<string, object> parameters = new Dictionary<string, object>();
 
         return parameters;
+    }
+
+    private string ConvertToModelUrl(string description)
+    {
+        return description switch
+        {
+            ModelEnum.Gpt4oMiniCode => "fanai",
+            _ => throw new NotImplementedException($"未实现指定的服务名称模型适配器：{ServiceKey}。")
+        };
     }
 }

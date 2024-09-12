@@ -54,7 +54,7 @@ public class AiModelService : ApiBase, IAiModelService
     #region Answer
     public async Task<string> AnswerTextAsync(
         AiArguments arguments,
-        int modelEnum = 12,
+        int modelEnum = 20,
         CancellationToken cancellationToken = default)
     {
         string url = $"/Ai/AnswerText?modelEnum={modelEnum}";
@@ -68,7 +68,7 @@ public class AiModelService : ApiBase, IAiModelService
 
     public async IAsyncEnumerable<string> AnswerStreamAsync(
         AiArguments arguments,
-        int modelEnum = 12,
+        int modelEnum = 20,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         // 调用API的URL
@@ -86,7 +86,7 @@ public class AiModelService : ApiBase, IAiModelService
 
     public async IAsyncEnumerable<string> AnswerStringsAsync(
         AiArguments arguments,
-        int modelEnum = 12,
+        int modelEnum = 20,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         string url = $"/Ai/AnswerStrings?modelEnum={modelEnum}";
@@ -103,7 +103,7 @@ public class AiModelService : ApiBase, IAiModelService
 
     public async IAsyncEnumerable<AiProgressResult> AnswerProgressAsync(
         List<AiArguments> requests,
-        int modelEnum = 12,
+        int modelEnum = 20,
         [EnumeratorCancellation] CancellationToken cancellation = default)
     {
         string url = $"/AiManager/AnswerProgress?modelEnum={modelEnum}";

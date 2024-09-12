@@ -19,21 +19,21 @@ public interface IAiModelService
     #region Answer
     Task<string> AnswerTextAsync(
        AiArguments arguments,
-       int modelEnum = 12,
+       int modelEnum = 20,
        CancellationToken cancellationToken = default);
 
     IAsyncEnumerable<string> AnswerStreamAsync(
         AiArguments arguments,
-        int modelEnum = 12,
+        int modelEnum = 20,
         CancellationToken cancellationToken = default);
     IAsyncEnumerable<string> AnswerStringsAsync(
         AiArguments arguments,
-        int modelEnum = 12,
+        int modelEnum = 20,
         CancellationToken cancellationToken = default);
 
     IAsyncEnumerable<AiProgressResult> AnswerProgressAsync(
         List<AiArguments> requests,
-        int modelEnum = 12,
+        int modelEnum = 20,
         CancellationToken cancellation = default);
 
     #endregion

@@ -10,6 +10,8 @@
 
 <FluentSwitch @bind-Value="@_displayMode" CheckedMessage="Text" UncheckedMessage="Markdown">DisplayMode:</FluentSwitch>
 
+<br>
+
 <MarkdownSection DisplayMode="@_displayMode" Content="@_botAnswer" />
 
 <FluentToastProvider />
