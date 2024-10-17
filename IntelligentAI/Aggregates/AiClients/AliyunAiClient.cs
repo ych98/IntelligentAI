@@ -1,34 +1,23 @@
-﻿using IntelligentAI.Records.Aliyun;
-using IntelligentAI.Records.Baidu;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Net.Http.Json;
+﻿using IntelligentAI.Utilities;
+using IntelligentAI.Records.Aliyun;
+using IntelligentAI.Records.Universal;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Text.Json;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
-namespace IntelligentAI.Aggregates.AiModels;
+namespace IntelligentAI.Aggregates.AiClients;
 
-public class BaiduAiModel : AiModelBase
+public class AliyunAiClient(HttpClient httpClient) : AiClientBase(httpClient)
 {
-    public BaiduAiModel(IHttpClientFactory httpClientFactory) : base(httpClientFactory)
-    {
-
-    }
-
     public override async Task<string> AnswerText(
-        string question,
+        string question, 
         Dictionary<string, object>? parameters = null,
         Records.Universal.Message[]? messages = null,
         CancellationToken cancellation = default)
     {
 
         string promptContent = string.Empty;
+
+        string systemContent = string.Empty;
 
         #region 参数校验
 
@@ -58,13 +47,17 @@ public class BaiduAiModel : AiModelBase
                 {
                     promptContent = prompt == PromptEnum.Custom
                         ? (string)template
-                        : prompt == PromptEnum.Null
+                        : prompt == PromptEnum.Null || prompt == PromptEnum.System
                             ? string.Empty
                             : prompt.Description;
+
+                    systemContent = prompt == PromptEnum.System
+                       ? (string)template
+                       : string.Empty;
                 }
                 else
                 {
-                    promptContent = prompt == PromptEnum.Null
+                    promptContent = prompt == PromptEnum.Null || prompt == PromptEnum.System
                             ? string.Empty
                             : prompt.Description;
                 }
@@ -76,39 +69,42 @@ public class BaiduAiModel : AiModelBase
         // 转换为大模型传入参数
         Dictionary<string, object> formatParameters = GetParameters(nameof(AnswerText), parameters);
 
-        formatParameters["messages"] = new Records.Universal.Message[]
-            {
-                new Records.Universal.Message("user", question + "\n" + promptContent)
-            };
+        var messageList = new List<Message>()
+        {
+            new Records.Universal.Message("system", string.IsNullOrWhiteSpace(systemContent)
+                ? "你是一名优秀的人工智能助手，擅长中文和英文的对话。你会为用户提供安全，有帮助，准确的回答。"
+                : systemContent)
+        };
 
-        var modelUrl = ConvertToModelUrl(model.Description);
+        if (messages is not null && messages.Any())
+        {
+            messageList.AddRange(messages);
+        }
 
-        var keys = ApiKey.Split(";");
+        formatParameters["input"] = new Dictionary<string, object>
+        {
+            {"messages",  messageList.Append(
+                new Records.Universal.Message(
+                    "user",
+                    HtmlUtilities.GetHtmlValue(TextUtilities.EscapePattern(question)) + "\n\n" + promptContent))}
+        };
 
-        var id = keys.First().Substring(keys.First().IndexOf("-") + 1);
+        formatParameters["model"] = model.Description;
 
-        var secret = keys.Last().Substring(keys.Last().IndexOf("-") + 1);
+        var headers = AdditionalHeaders(stream: false);
 
-        var token = await GetAsync<BaiduTokenResult>(ApiEnum.BaiduService.Name,
-            $"/oauth/2.0/token?grant_type=client_credentials&client_id={id}&client_secret={secret}",
-            cancellation: cancellation);
+        var aiResult = await CallAsync<Records.Aliyun.AliyunResult>("/api/v1/services/aigc/text-generation/generation", formatParameters, ApiKey, additionalHeaders: headers, cancellation: cancellation);
 
-        var aiResult = await CallAsync<Records.Baidu.BaiduResult>(
-            ApiEnum.BaiduService.Name,
-            $"/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/{modelUrl}?access_token={token.AccessToken}",
-            formatParameters,
-            cancellation: cancellation);
-
-        return aiResult.Result;
+        return aiResult.Output.Choices.FirstOrDefault().Message.Content;
     }
 
-    public override async IAsyncEnumerable<string> AnswerStream(
-        string question,
+    public override async IAsyncEnumerable<string> AnswerStream(string question, 
         Dictionary<string, object>? parameters = null,
         Records.Universal.Message[]? messages = null,
         [EnumeratorCancellation] CancellationToken cancellation = default)
     {
         string promptContent = string.Empty;
+        string systemContent = string.Empty;
 
         #region 参数校验
 
@@ -138,13 +134,17 @@ public class BaiduAiModel : AiModelBase
                 {
                     promptContent = prompt == PromptEnum.Custom
                         ? (string)template
-                        : prompt == PromptEnum.Null
+                        : prompt == PromptEnum.Null || prompt == PromptEnum.System
                             ? string.Empty
                             : prompt.Description;
+                    systemContent = prompt == PromptEnum.System
+                       ? (string)template
+                       : string.Empty;
+
                 }
                 else
                 {
-                    promptContent = prompt == PromptEnum.Null
+                    promptContent = prompt == PromptEnum.Null || prompt == PromptEnum.System
                             ? string.Empty
                             : prompt.Description;
                 }
@@ -156,27 +156,34 @@ public class BaiduAiModel : AiModelBase
         // 转换为大模型传入参数
         Dictionary<string, object> formatParameters = GetParameters(nameof(AnswerStream), parameters);
 
-        formatParameters["messages"] = new Records.Universal.Message[]
+        var messageList = new List<Message>()
         {
-            new Records.Universal.Message("user",question + "\n" + promptContent)
+            new Records.Universal.Message("system", string.IsNullOrWhiteSpace(systemContent)
+                ? "你是一名优秀的人工智能助手，擅长中文和英文的对话。你会为用户提供安全，有帮助，准确的回答。"
+                : systemContent)
         };
 
-        var modelUrl = ConvertToModelUrl(model.Description);
+        if (messages is not null && messages.Any())
+        {
+            messageList.AddRange(messages);
+        }
 
-        var keys = ApiKey.Split(";");
+        formatParameters["input"] = new Dictionary<string, object>
+        {
+            {"messages",  messageList.Append(new Records.Universal.Message(
+                "user",
+                HtmlUtilities.GetHtmlValue(TextUtilities.EscapePattern(question)) + "\n\n" + promptContent))}
+        };
 
-        var id = keys.First().Substring(keys.First().IndexOf("-") + 1);
+        formatParameters["model"] = model.Description;
 
-        var secret = keys.Last().Substring(keys.Last().IndexOf("-") + 1);
-
-        var token = await GetAsync<BaiduTokenResult>(ApiEnum.BaiduService.Name,
-            $"/oauth/2.0/token?grant_type=client_credentials&client_id={id}&client_secret={secret}",
-            cancellation: cancellation);
+        var headers = AdditionalHeaders(stream: true);
 
         await foreach (var single in CallStreamAsync<string>(
-            ApiEnum.BaiduService.Name,
-            $"/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/{modelUrl}?access_token={token.AccessToken}",
-            formatParameters,
+            "/api/v1/services/aigc/text-generation/generation", 
+            formatParameters, 
+            ApiKey, 
+            headers, 
             cancellation: cancellation))
         {
             if (string.IsNullOrWhiteSpace(single)) continue;
@@ -185,17 +192,20 @@ public class BaiduAiModel : AiModelBase
 
             string message = single.Substring(single.IndexOf(':') + 1);
 
-            var option = new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+            JsonSerializerOptions option = new JsonSerializerOptions()
+            {
+                PropertyNameCaseInsensitive = true
+            };
 
             string[] result = Array.Empty<string>();
 
             try
             {
-                var reply = System.Text.Json.JsonSerializer.Deserialize<BaiduResult>(message, option);
+               var reply = System.Text.Json.JsonSerializer.Deserialize<AliyunResult>(message, option);
 
-                if (reply is null || string.IsNullOrWhiteSpace(reply.Result)) continue;
+                if (reply is null || reply?.Output?.Choices?.First() is null) continue;
 
-                result = reply.Result.Replace(@"\\", @"\").Split(@"\n");
+                result = reply?.Output?.Choices?.First()?.Message?.Content?.Replace(@"\\", @"\").Split(@"\n");
             }
             catch (System.Text.Json.JsonException ex)
             {
@@ -234,20 +244,30 @@ public class BaiduAiModel : AiModelBase
         {
             nameof(AnswerText) => new Dictionary<string, object>
                 {
-                    // Baidu chat 接口参数
-                    {"messages", new List<Records.Universal.Message>()},
-                    {"temperature", 0.9},
-                    {"penalty_score", 1.0},
-                    {"top_p", 0.7}
+                    // Aliyun chat 接口参数
+                    {"model", "qwen-long"},
+                    {"input",new Dictionary<string, object>
+                        {
+                            {"messages", new List<Records.Universal.Message>()}
+                        }},
+                    {"parameters", new Dictionary<string, object>
+                        {
+                            {"result_format", "message"}
+                        }}
                 },
             nameof(AnswerStream) => new Dictionary<string, object>
                 {
-                    // Baidu chat 接口参数
-                    {"messages", new List<Records.Universal.Message>()},
-                    {"temperature", 0.9},
-                    {"stream", true},
-                    {"penalty_score", 1.0},
-                    {"top_p", 0.7}
+                    // Aliyun chat 接口参数
+                    {"model", "qwen-long"},
+                    {"input", new Dictionary<string, object>
+                        {
+                            {"messages", new List<Records.Universal.Message>()}
+                        }},
+                    {"parameters", new Dictionary<string, object>
+                        {
+                            {"incremental_output", true},
+                            {"result_format", "message"}
+                        }}
                 },
             _ => throw new ArgumentException($"Unknown method: {method}")
         };
@@ -283,38 +303,51 @@ public class BaiduAiModel : AiModelBase
     }
 
     // 存储每个方法的键映射关系 接口输入参数名称 => 传入大模型参数名称
-    private Dictionary<string, Dictionary<string, string>> MethodKeyMappings
-        => new Dictionary<string, Dictionary<string, string>>
+    private Dictionary<string, Dictionary<string, string>> MethodKeyMappings => new Dictionary<string, Dictionary<string, string>>    {
         {
+            nameof(AnswerText), new Dictionary<string, string>
             {
-                nameof(AnswerText), new Dictionary<string, string>
-                {
-                    {"topP", "top_p"}
-                }
+                {"topP", "top_p"}
+            }
+        },
+        {
+            nameof(AnswerStream), new Dictionary<string, string>
+            {
+                {"topP", "top_p"}
+            }
+        }
+    };
+
+
+    private Dictionary<string, string> AdditionalHeaders(bool stream)
+    {
+        return ModelName switch
+        {
+            ModelEnum.AliLongCode => new Dictionary<string, string>()
+            {
+                ["X-DashScope-SSE"] = stream ? "enable" : "disable",
+                ["X-DashScope-DataInspection"] = "{\"input\":\"disable\", \"output\":\"disable\"}"
             },
+            ModelEnum.AliPlusCode => new Dictionary<string, string>()
             {
-                nameof(AnswerStream), new Dictionary<string, string>
-                {
-                    {"topP", "top_p"}
-                }
+                ["X-DashScope-SSE"] = stream ? "enable" : "disable",
+                ["X-DashScope-DataInspection"] = "{\"input\":\"disable\", \"output\":\"disable\"}"
+            },
+            ModelEnum.AliTurboCode => new Dictionary<string, string>()
+            {
+                ["X-DashScope-SSE"] = stream ? "enable" : "disable",
+                ["X-DashScope-DataInspection"] = "{\"input\":\"disable\", \"output\":\"disable\"}"
+            },
+            ModelEnum.AliMaxCode => new Dictionary<string, string>()
+            {
+                ["X-DashScope-SSE"] = stream ? "enable" : "disable",
+                ["X-DashScope-DataInspection"] = "{\"input\":\"disable\", \"output\":\"disable\"}"
+            },
+            _ => new Dictionary<string, string>()
+            {
+                ["X-DashScope-SSE"] = stream ? "enable" : "disable"
             }
         };
 
-    private string ConvertToModelUrl(string description)
-    {
-        return description switch
-        {
-            ModelEnum.ErnieSpeedCode => "ernie_speed",
-            ModelEnum.ErnieSpeedProCode => "ernie-speed-128k",
-            _ => throw new NotImplementedException($"未实现指定的服务名称模型适配器：{ServiceKey}。")
-        };
     }
 }
-
-public record BaiduTokenResult(
-    [property: System.Text.Json.Serialization.JsonPropertyName("refresh_token")] string RefreshToken,
-    [property: System.Text.Json.Serialization.JsonPropertyName("expires_in")] int Expires,
-    [property: System.Text.Json.Serialization.JsonPropertyName("session_key")] string SessionKey,
-    [property: System.Text.Json.Serialization.JsonPropertyName("access_token")] string AccessToken,
-    [property: System.Text.Json.Serialization.JsonPropertyName("scope")] string Scope,
-    [property: System.Text.Json.Serialization.JsonPropertyName("session_secret")] string SessionSecret);

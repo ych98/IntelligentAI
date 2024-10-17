@@ -9,13 +9,8 @@ using System.Threading.Tasks;
 
 namespace IntelligentAI.Aggregates.AiModels;
 
-public class GoogleAiModel : AiModelBase
+public class GoogleAiClient(HttpClient httpClient) : AiClientBase(httpClient)
 {
-    public GoogleAiModel(IHttpClientFactory httpClientFactory) :base(httpClientFactory)
-    {
-        
-    }
-
     public override Task<string[]> AnswerImages(string input, Dictionary<string, object>? parameters = null, CancellationToken cancellation = default)
     {
         throw new NotImplementedException();

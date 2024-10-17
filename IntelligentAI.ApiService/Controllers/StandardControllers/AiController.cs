@@ -11,12 +11,10 @@ namespace IntelligentAI.ApiService.Controllers.StandardControllers;
 [TypeFilter(typeof(ExceptionHandlerFilter))]
 public class AiController : ControllerBase
 {
-    private readonly IAiModelFactory _modelFactory;
-    private readonly IAiModelEventManager _eventManager;
+    private readonly IAiClientFactory _modelFactory;
+    private readonly IAiClientEventManager _eventManager;
 
-    private const string BusyMessage = "当前系统正忙，排队任务较多，请稍后再试...";
-
-    public AiController(IAiModelFactory modelFactory,IAiModelEventManager eventManager)
+    public AiController(IAiClientFactory modelFactory,IAiClientEventManager eventManager)
     {
         _eventManager = eventManager;
         _modelFactory = modelFactory;
@@ -26,7 +24,6 @@ public class AiController : ControllerBase
     /// 
     /// </summary>
     /// <param name="request"></param>
-    /// <param name="score">返回答案和content的相似分数，0：不返回分数，1：返回分数</param>
     /// <param name="modelEnum"> Default: 6. Model name is qwen-long. </param>
     /// <param name="cancellation"></param>
     /// <returns></returns>    
@@ -34,23 +31,14 @@ public class AiController : ControllerBase
     [Log(MeasureTime = true)]
     public async Task<string> AnswerTextAsync(
         [FromBody] AiArguments request, 
-        [FromQuery] int score = 0,
         [FromQuery] int modelEnum = 6, 
         CancellationToken cancellation = default)
     {
-
-        ModelEnum modelInformation = ModelEnum.GetById(modelEnum);
-
-        var model = _modelFactory.CreateModel(modelInformation.Name, modelInformation.Description);
-
-        if (await _eventManager.IsBusy(model, cancellation)) throw new ApplicationException(BusyMessage);
-
-        Dictionary<string, object> parameters = request.ToDictionary();
-        parameters.Add("score", score);
+        var model = _modelFactory.CreateClient(modelEnum);
 
         var result = await model.AnswerText(
-            request.Question, 
-            parameters,
+            request.Question,
+            request.ToDictionary(),
             request.Messages,
             cancellation: cancellation);
 
@@ -61,32 +49,20 @@ public class AiController : ControllerBase
     /// 
     /// </summary>
     /// <param name="request"></param>
-    /// <param name="score">和question匹配的文档相关度阀值，低于这个数的采用</param>
-    /// <param name="apiVersion">2为新版流式接口，进行了幻觉问题优化</param>
     /// <param name="modelEnum"> Default: 6. Model name is qwen-long. </param>
     /// <param name="cancellation"></param>
     /// <returns></returns>
     [HttpPost]
     public async IAsyncEnumerable<string> AnswerStringsAsync(
-        [FromBody] AiArguments request, 
-        [FromQuery] double score = 0.6, 
-        [FromQuery] int apiVersion = 2, 
+        [FromBody] AiArguments request,
         [FromQuery] int modelEnum = 6,
         [EnumeratorCancellation] CancellationToken cancellation = default)
     {
-        ModelEnum modelInformation = ModelEnum.GetById(modelEnum);
-
-        var model = _modelFactory.CreateModel(modelInformation.Name, modelInformation.Description);
-
-        if (await _eventManager.IsBusy(model, cancellation)) throw new ApplicationException(BusyMessage);
-
-        Dictionary<string, object> parameters = request.ToDictionary();
-        parameters.Add("score", score);
-        parameters.Add("apiVersion", apiVersion);
+        var model = _modelFactory.CreateClient(modelEnum);
 
         await foreach (var result in model.AnswerStream(
             request.Question,
-            parameters,
+            request.ToDictionary(),
             request.Messages,
             cancellation: cancellation))
         {
@@ -103,8 +79,6 @@ public class AiController : ControllerBase
     /// 
     /// </summary>
     /// <param name="request"></param>
-    /// <param name="score"></param>
-    /// <param name="apiVersion"> </param>
     /// <param name="modelEnum"> Default: 6. Model name is qwen-long. </param>
     /// <param name="streamType"> Default: false. ContentType is text/event-stream. Additional configuration for nginx is required. </param>
     /// <param name="cancellation"></param>
@@ -112,27 +86,17 @@ public class AiController : ControllerBase
     [HttpPost]
     public async Task AnswerStreamAsync(
         [FromBody] AiArguments request,
-        [FromQuery] double score = 0.6,
-        [FromQuery] int apiVersion = 2,
         [FromQuery] int modelEnum = 6,
         [FromQuery] bool streamType = false,
         CancellationToken cancellation = default)
     {
         Response.ContentType = streamType ? "application/octet-stream" : "text/event-stream";
 
-        ModelEnum modelInformation = ModelEnum.GetById(modelEnum);
-
-        var model = _modelFactory.CreateModel(modelInformation.Name, modelInformation.Description);
-
-        if (await _eventManager.IsBusy(model, cancellation)) throw new ApplicationException(BusyMessage);
-
-        Dictionary<string, object> parameters = request.ToDictionary();
-        parameters.Add("score", score);
-        //parameters.Add("apiVersion", apiVersion);
+        var model = _modelFactory.CreateClient(modelEnum);
 
         await foreach (var result in model.AnswerStream(
             request.Question,
-            parameters,
+            request.ToDictionary(),
             request.Messages,
             cancellation: cancellation))
         {
@@ -155,15 +119,11 @@ public class AiController : ControllerBase
         [FromQuery] int modelEnum = 3,
         CancellationToken cancellation = default)
     {
-        ModelEnum modelInformation = ModelEnum.GetById(modelEnum);
-
-        var model = _modelFactory.CreateModel(modelInformation.Name, modelInformation.Description);
-
-        Dictionary<string, object> parameters = request.ToDictionary();
+        var model = _modelFactory.CreateClient(modelEnum);
 
         var message = await model.AnswerVideo(
             request.Question,
-            parameters,
+            request.ToDictionary(),
             cancellation: cancellation);
 
         return Ok(message);
@@ -182,18 +142,41 @@ public class AiController : ControllerBase
         [FromQuery] int modelEnum = 3,
         CancellationToken cancellation = default)
     {
-        ModelEnum modelInformation = ModelEnum.GetById(modelEnum);
-
-        var model = _modelFactory.CreateModel(modelInformation.Name, modelInformation.Description);
-
-        Dictionary<string, object> parameters = request.ToDictionary();
+        var model = _modelFactory.CreateClient(modelEnum);
 
         var message = await model.AnswerVideo(
             request.Question,
-            parameters,
+            request.ToDictionary(),
             cancellation: cancellation);
 
         return Ok(message);
+    }
+
+    [HttpPost]
+    public async IAsyncEnumerable<AiProgressResult> AnswerProgressAsync(
+    [FromBody] List<AiArguments> requests,
+    [FromQuery] int modelEnum = 6,
+    [FromQuery] Guid? eventId = null,
+    [FromQuery] Guid? parentTaskId = null,
+    [FromQuery] string? taskName = null,
+    [EnumeratorCancellation] CancellationToken cancellation = default)
+    {
+        var model = _modelFactory.CreateClient(modelEnum);
+
+        await foreach (var result in _eventManager.StartTasksAsync(
+            model,
+            eventId ?? Guid.NewGuid(),
+            parentTaskId ?? Guid.NewGuid(),
+            requests,
+            taskName ?? "EventTasks",
+            cancellation: cancellation))
+        {
+            cancellation.ThrowIfCancellationRequested(); 
+
+            await Task.Delay(1);
+
+            yield return result;
+        }
     }
 
     /// <summary>
@@ -201,9 +184,9 @@ public class AiController : ControllerBase
     /// </summary>
     /// <returns></returns>    
     [HttpGet]
-    public IActionResult AnswerModels()
+    public IActionResult GetClients()
     {
-        var modelInformations = ModelEnum.GetAll<ModelEnum>().Where(x => x.Id > 1);
+        var modelInformations = ModelEnum.GetAll<ModelEnum>();
 
         return Ok(modelInformations);
     }

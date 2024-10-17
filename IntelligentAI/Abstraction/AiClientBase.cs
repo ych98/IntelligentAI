@@ -9,27 +9,15 @@ using System.Threading;
 
 namespace IntelligentAI.Abstraction;
 
-public abstract class AiModelBase : ApiBase
+public abstract class AiClientBase(HttpClient httpClient) : ApiClientBase(httpClient)
 {
-    public string ServiceName { get; set; }
+    public required string ServiceName { get; set; }
 
-    public string ModelName { get; set; }
+    public required string ModelName { get; set; }
 
     public string ServiceKey => $"{ServiceName}-{ModelName}";
 
-    public int ConcurrentNumber { get; set; }
-
-    public string ApiKey { get; set; }
-
-
-    #region 构造函数
-
-    public AiModelBase(IHttpClientFactory httpClientFactory) : base(httpClientFactory)
-    {
-
-    }
-
-    #endregion
+    public string? ApiKey { get; set; }
 
     public abstract Task<string> AnswerText(
         string question,
@@ -57,13 +45,14 @@ public abstract class AiModelBase : ApiBase
         string method,
         Dictionary<string, object>? overrides = null,
         MissingKeyBehavior missingKeyBehavior = MissingKeyBehavior.Error);
-    
+
 }
 
-
-public class AiModelOption
+public class AIProviderSettings
 {
-    public int ConcurrentNumber { get; set; }
+    public required string Host { get; set; }
 
-    public string? ApiKey { get; set; }
+    public required string ApiKey { get; set; }
+
+    public required List<string> Models { get; set; }
 }

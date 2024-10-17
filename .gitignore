@@ -25,6 +25,7 @@ obj/
 *.Development.json
 *-nlog.txt
 *.tar
+publish/
 
 # MAUI
 **/bin/

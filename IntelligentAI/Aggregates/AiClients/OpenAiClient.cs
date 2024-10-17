@@ -9,13 +9,8 @@ using System.Threading.Tasks;
 
 namespace IntelligentAI.Aggregates.AiModels;
 
-public class OpenAiModel : AiModelBase
+public class OpenAiClient(HttpClient httpClient) : AiClientBase(httpClient)
 {
-    public OpenAiModel(IHttpClientFactory httpClientFactory) : base(httpClientFactory)
-    {
-
-    }
-
     public override Task<string[]> AnswerImages(string input, Dictionary<string, object>? parameters = null, CancellationToken cancellation = default)
     {
         throw new NotImplementedException();

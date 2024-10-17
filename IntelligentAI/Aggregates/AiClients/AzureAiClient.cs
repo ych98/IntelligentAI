@@ -17,13 +17,8 @@ using System.Threading.Tasks;
 
 namespace IntelligentAI.Aggregates.AiModels;
 
-public class AzureModel : AiModelBase
+public class AzureAiClient(HttpClient httpClient) : AiClientBase(httpClient)
 {
-    public AzureModel(IHttpClientFactory httpClientFactory) : base(httpClientFactory)
-    {
-
-    }
-
     public override async Task<string> AnswerText(
         string question,
         Dictionary<string, object>? parameters = null,
@@ -94,11 +89,9 @@ public class AzureModel : AiModelBase
             }
         }
 
-        var client = _httpClientFactory.CreateClient(ApiEnum.AzureService.Name);
-
         AzureOpenAIClient azureClient = new(
-            client.BaseAddress,
-            new AzureKeyCredential(ApiKey));
+            httpClient.BaseAddress,
+            new ApiKeyCredential(ApiKey));
 
         ChatClient chatClient = azureClient.GetChatClient(ConvertToModelUrl(model.Description));
 
@@ -188,11 +181,9 @@ public class AzureModel : AiModelBase
             }
         }
 
-        var client = _httpClientFactory.CreateClient(ApiEnum.AzureService.Name);
-       
         AzureOpenAIClient azureClient = new(
-            client.BaseAddress,
-            new AzureKeyCredential(ApiKey));
+            httpClient.BaseAddress,
+            new ApiKeyCredential(ApiKey));
 
         ChatClient chatClient = azureClient.GetChatClient(ConvertToModelUrl(model.Description));
 

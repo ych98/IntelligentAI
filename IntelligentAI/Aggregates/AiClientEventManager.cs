@@ -7,20 +7,20 @@ using System.Threading.Channels;
 
 namespace IntelligentAI.Aggregates;
 
-public class AiModelEventManager : IAiModelEventManager
+public class AiClientEventManager : IAiClientEventManager
 {
     private readonly ConcurrentDictionary<string, Channel<AiProgressResult>> _todoTasks = new ConcurrentDictionary<string, Channel<AiProgressResult>>();
     private readonly ConcurrentDictionary<string, Channel<AiProgressResult>> _finishedTasks = new ConcurrentDictionary<string, Channel<AiProgressResult>>();
 
-    private readonly ILogger<AiModelEventManager> _logger;
+    private readonly ILogger<AiClientEventManager> _logger;
 
-    public AiModelEventManager(ILogger<AiModelEventManager> logger)
+    public AiClientEventManager(ILogger<AiClientEventManager> logger)
     {
         _logger = logger;
     }
 
     public async IAsyncEnumerable<AiProgressResult> StartTasksAsync(
-        AiModelBase model,
+        AiClientBase model,
         Guid eventId,
         Guid parentTaskId,
         IEnumerable<AiArguments> tasks,
@@ -31,8 +31,6 @@ public class AiModelEventManager : IAiModelEventManager
 
         // 创建 CancellationTokenSource 用于定期检查任务
         var periodicCheckCts = new CancellationTokenSource();
-
-
 
         // 启动定期检查任务
         StartPeriodicCheck(channelName, periodicCheckCts.Token);
@@ -74,9 +72,7 @@ public class AiModelEventManager : IAiModelEventManager
             // 用于跟踪任务和消费者名称
             var consumers = new Dictionary<Task, string>();
 
-            int count = Math.Min(model.ConcurrentNumber, todoChannel.Reader.Count);
-
-            for (int i = 1; i <= count; i++)
+            for (int i = 1; i <= todoChannel.Reader.Count; i++)
             {
                 var consumerName = $"{eventId}-Consumer-{i}";
 
@@ -97,7 +93,7 @@ public class AiModelEventManager : IAiModelEventManager
                 consumers.Remove(completedTask);
 
                 // 在这里添加检查以确定是否可以启动新的消费者任务
-                if (todoChannel.Reader.Count > 0 && consumers.Count < model.ConcurrentNumber)
+                if (todoChannel.Reader.Count > 0)
                 {
                     var newConsumerTask = ConsumeAsync(todoChannel.Reader, finishedChannel.Writer, model, completedConsumerName, cancellation);
 
@@ -120,71 +116,6 @@ public class AiModelEventManager : IAiModelEventManager
         periodicCheckCts.Cancel();
     }
 
-    /// <summary>
-    /// 在开启任务前调用
-    /// 1.队列未创建或无任务 => false
-    /// 2.队列中 任务数/并发数 <= 3 且 超时 < 15s => false
-    /// 3.队列中 任务数/并发数 <= 3 超时 >= 15s => true
-    /// 4.队列中 任务数/并发数 > 3 => true
-    /// </summary>
-    /// <param name="serviceName"></param>
-    /// <param name="modelName"></param>
-    /// <param name="cancellation"></param>
-    /// <returns></returns>
-    public async Task<bool> IsBusy(AiModelBase model, CancellationToken cancellation = default)
-    {
-        var count = GetAllTasks(model);
-
-        if (count == 0) return false;
-
-        // 计算任务数与并发数的比例
-        var ratio = (double)count / model.ConcurrentNumber;
-
-        if (ratio > 3) return true;
-
-        using (var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellation))
-        {
-            linkedCts.CancelAfter(TimeSpan.FromSeconds(15));
-
-            try
-            {
-
-                while (count > 0)
-                {
-                    await Task.Delay(1000, linkedCts.Token);
-
-                    count = GetAllTasks(model);
-                }
-
-                return false;
-            }
-            catch (TaskCanceledException)
-            {
-                return true;
-            }
-        }
-
-    }
-
-    public int GetAllTasks(AiModelBase model)
-    {
-        int count = 0;
-
-        var channels = _todoTasks
-           .Where(kvp => kvp.Key.Contains(model.ServiceKey))? // 过滤出包含 ServiceKey 的键
-           .Select(kvp => kvp.Value); // 选择对应的值
-
-        if (channels is null || !channels.Any()) return count;
-
-        foreach (var channel in channels)
-        {
-            count += channel.Reader.Count;
-        }
-
-        // 返回新的Channel
-        return count;
-    }
-
     private async Task ProduceAsync(ChannelWriter<AiProgressResult> writer, IEnumerable<AiProgressResult> tasks, CancellationToken cancellation = default)
     {
         // 启动生产者任务
@@ -203,7 +134,7 @@ public class AiModelEventManager : IAiModelEventManager
     private async Task ConsumeAsync(
         ChannelReader<AiProgressResult> reader,
         ChannelWriter<AiProgressResult> writer,
-        AiModelBase model,
+        AiClientBase model,
         string consumerName,
         CancellationToken cancellation)
     {

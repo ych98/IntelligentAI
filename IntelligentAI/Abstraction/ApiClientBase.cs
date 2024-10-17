@@ -15,8 +15,6 @@ public class ApiClientBase(HttpClient httpClient)
     /// <summary>
     /// Api Post Form 调用 
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="service"></param>
     /// <param name="url"></param>
     /// <param name="args"></param>
     /// <param name="cancellation"></param>
@@ -105,8 +103,6 @@ public class ApiClientBase(HttpClient httpClient)
     /// <summary>
     /// Api Get Json 调用 
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="service"></param>
     /// <param name="url"></param>
     /// <param name="args"></param>
     /// <param name="cancellation"></param>
@@ -130,25 +126,66 @@ public class ApiClientBase(HttpClient httpClient)
             throw new ApplicationException($"服务器返回错误消息: {errorMessage}");
         }
 
+        JsonSerializerOptions options = new JsonSerializerOptions()
+        {
+            PropertyNameCaseInsensitive = true
+        };
+
         if (typeof(TOut) == typeof(string))
         {
             return (TOut)(object)await response.Content.ReadAsStringAsync(cancellation);
         }
         else
         {
-            var result = await response.Content.ReadFromJsonAsync<TOut>(cancellation);
+            var result = await response.Content.ReadFromJsonAsync<TOut>(options, cancellation);
 
             return result;
         }
 
     }
 
+    /// <summary>
+    /// Api Post Json 调用 
+    /// </summary>
+    /// <param name="url"></param>
+    /// <param name="args"></param>
+    /// <param name="cancellation"></param>
+    /// <returns></returns>
+    protected virtual async Task CallAsync(
+        string url,
+        Dictionary<string, object> args,
+        string? bearer = null,
+        Dictionary<string, string>? additionalHeaders = null,
+        CancellationToken cancellation = default)
+    {
+        if (!string.IsNullOrWhiteSpace(bearer))
+        {
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearer);
+        }
+
+        if (additionalHeaders is not null && additionalHeaders.Values.Any())
+        {
+            foreach (var header in additionalHeaders)
+            {
+                httpClient.DefaultRequestHeaders.Add(header.Key, header.Value);
+            }
+        }
+
+        // 发送POST请求
+        HttpResponseMessage response;
+
+        response = await httpClient.PostAsJsonAsync(url, args, cancellation);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var errorMessage = await response.Content.ReadAsStringAsync();
+            throw new ApplicationException($"服务器返回错误消息: {errorMessage}");
+        }
+    }
 
     /// <summary>
     /// Api Post Json 调用 
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="service"></param>
     /// <param name="url"></param>
     /// <param name="args"></param>
     /// <param name="cancellation"></param>
@@ -217,8 +254,6 @@ public class ApiClientBase(HttpClient httpClient)
     /// <summary>
     /// Api Post Json 调用 
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="service"></param>
     /// <param name="url"></param>
     /// <param name="args"></param>
     /// <param name="cancellation"></param>

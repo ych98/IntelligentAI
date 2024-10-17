@@ -11,15 +11,12 @@ builder.AddServiceDefaults();
 // Add services to the container.
 builder.Services.AddProblemDetails();
 
-var apis = builder.Configuration.GetSection("ModelApis").Get<ModelApis>();
-var keys = builder.Configuration.GetSection("ApiKeys").Get<ApiKeys>();
 var swaggerConfig = builder.Configuration.GetSection("SwaggerConfig").Get<List<SwaggerConfig>>();
 
-// Add HttpClients
-builder.Services.AddHttpClients(apis);
+// Add AiClients
+builder.Services.AddAiClients();
 
-// Add AiModels
-builder.Services.AddAiModels(keys);
+builder.Services.AddSingleton<IAiClientEventManager, AiClientEventManager>();
 
 // Register controllers
 builder.Services.AddControllers();

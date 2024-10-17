@@ -13,17 +13,14 @@ using System.Threading.Tasks;
 
 namespace IntelligentAI.Abstraction;
 
-public interface IAiModelEventManager
+public interface IAiClientEventManager
 {
     IAsyncEnumerable<AiProgressResult> StartTasksAsync(
-        AiModelBase model,
+        AiClientBase model,
         Guid eventId,
         Guid parentTaskId,
         IEnumerable<AiArguments> tasks,
         string taskName = "EventTasks",
         CancellationToken cancellation = default);
-
-    Task<bool> IsBusy(AiModelBase model, CancellationToken cancellation = default);
-
 }
 

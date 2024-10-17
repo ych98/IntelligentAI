@@ -1,20 +1,18 @@
-﻿using System.Text.RegularExpressions;
+﻿using IntelligentAI.Records.Kimi;
+using System.Runtime.CompilerServices;
+using System.Text.Json;
 
-namespace IntelligentAI.Aggregates.AiModels;
+namespace IntelligentAI.Aggregates.AiClients;
 
-public class HuoshanAiModel : AiModelBase
+public class KimiAiClient(HttpClient httpClient) : AiClientBase(httpClient)
 {
-    public HuoshanAiModel(IHttpClientFactory httpClientFactory) :base(httpClientFactory)
-    {
-        
-    }
-
     public override async Task<string> AnswerText(
         string question, 
         Dictionary<string, object>? parameters = null,
         Records.Universal.Message[]? messages = null, 
         CancellationToken cancellation = default)
     {
+
         string promptContent = string.Empty;
 
         #region 参数校验
@@ -65,19 +63,20 @@ public class HuoshanAiModel : AiModelBase
 
         formatParameters["messages"] = new Records.Universal.Message[]
             {
-                new Records.Universal.Message("system", "你是一个人工智能助手，擅长中文和英文的对话。你会为用户提供安全，有帮助，准确的回答。"),
-                new Records.Universal.Message("user", question + "\n" + promptContent)
+                new Records.Universal.Message("system","你是 Kimi，由 Moonshot AI 提供的人工智能助手，你更擅长中文和英文的对话。你会为用户提供安全，有帮助，准确的回答。"),
+                new Records.Universal.Message("user",question + "\n" + promptContent)
             };
 
         formatParameters["model"] = model.Description;
 
-        var aiResult = await CallAsync<Records.Kimi.KimiResult>(ApiEnum.HuoshanService.Name, "/api/v3/chat/completions", formatParameters, ApiKey,cancellation: cancellation);
+        var aiResult = await CallAsync<Records.Kimi.KimiResult>("/v1/chat/completions", formatParameters, ApiKey,cancellation: cancellation);
 
         return aiResult.Choices.FirstOrDefault().Message.Content;
     }
 
     public override async IAsyncEnumerable<string> AnswerStream(string question, Dictionary<string, object>? parameters = null,
-        Records.Universal.Message[]? messages = null, CancellationToken cancellation = default)
+        Records.Universal.Message[]? messages = null,
+        [EnumeratorCancellation] CancellationToken cancellation = default)
     {
         string promptContent = string.Empty;
 
@@ -129,39 +128,42 @@ public class HuoshanAiModel : AiModelBase
 
         formatParameters["messages"] = new Records.Universal.Message[]
         {
-            new Records.Universal.Message("system", "你是一个人工智能助手，擅长中文和英文的对话。你会为用户提供安全，有帮助，准确的回答。"),
-            new Records.Universal.Message("user", question + "\n" + promptContent)
-        };
+            new Records.Universal.Message("system","你是 Kimi，由 Moonshot AI 提供的人工智能助手，你更擅长中文和英文的对话。你会为用户提供安全，有帮助，准确的回答。"),
+            new Records.Universal.Message("user",question + "\n" + promptContent)
+        };  
 
-        formatParameters["model"] = ConvertToModelName(model.Description);
+        formatParameters["model"] = model.Description;
 
-        await foreach (var message in CallStreamAsync<string>(ApiEnum.HuoshanService.Name, "/api/v3/chat/completions", formatParameters, ApiKey, cancellation: cancellation))
+        await foreach (var single in CallStreamAsync<string>("/v1/chat/completions", formatParameters, ApiKey, cancellation: cancellation))
         {
-            // 处理v2版本的接口返回内容
-            string pattern = @"""content"":\s*""([^""]*)""";
+            if (string.IsNullOrWhiteSpace(single)) continue;
 
-            List<string> answers = new List<string>();
+            if (!single.StartsWith("data:") || single == "data: [DONE]") continue;
 
-            foreach (System.Text.RegularExpressions.Match match in Regex.Matches(message, pattern))
+            string message = single.Substring(single.IndexOf(':') + 1);
+
+            var option = new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+
+            string[] result = Array.Empty<string>();
+
+            try
             {
-                answers.Add(match.Groups[1].Value);
+                var reply = System.Text.Json.JsonSerializer.Deserialize<KimiResult>(message, option);
+
+                if (reply is null || reply?.Choices?.First() is null) continue;
+
+                result = reply?.Choices?.First()?.Delta?.Content?.Replace(@"\\", @"\").Split(@"\n");
+            }
+            catch (System.Text.Json.JsonException ex)
+            {
+                throw new ApplicationException($"An error is generated during deserializing process: \n{ex.Message} \n {message}.");
             }
 
-            if (answers.Any())
-            {
-                string result = string.Join("", answers);
+            if (result is null || !result.Any()) continue;
 
-                // 处理接口返回内容中存在的换行符
-                var formattedMessages = result.Replace(@"\\", @"\").Split(@"\n");
-
-                foreach (var m in formattedMessages)
-                {
-                    yield return m;
-                }
-            }
-            else
+            foreach (var m in result)
             {
-                yield return "";
+                yield return string.IsNullOrEmpty(m) ? "\n" : m;
             }
         }
 
@@ -188,18 +190,22 @@ public class HuoshanAiModel : AiModelBase
         {
             nameof(AnswerText) => new Dictionary<string, object>
                 {
-                    {"model", string.Empty},
+                    // Kimi chat 接口参数
+                    {"model", "moonshot-v1-8k"},
                     {"messages", new List<Records.Universal.Message>()},
                     {"temperature", 0.3},
+                    {"presence_penalty", 0},
                     {"frequency_penalty", 0},
                     {"top_p", 1.0}
                 },
             nameof(AnswerStream) => new Dictionary<string, object>
                 {
-                    {"model", string.Empty},
+                    // Kimi chat 接口参数
+                    {"model", "moonshot-v1-8k"},
                     {"messages", new List<Records.Universal.Message>()},
                     {"temperature", 0.3},
                     {"stream", true},
+                    {"presence_penalty", 0},
                     {"frequency_penalty", 0},
                     {"top_p", 1.0}
                 },
@@ -251,15 +257,4 @@ public class HuoshanAiModel : AiModelBase
             }
         }
     };
-
-    private string ConvertToModelName(string description) 
-    {
-        return description switch
-        {
-            ModelEnum.GLM3Code => "ep-20240619092514-7rrqx",
-            ModelEnum.MistralCode => "ep-20240619092424-hnwf9",
-            ModelEnum.Llama3Code => "ep-20240619092214-dhjcb",
-            _ => throw new NotImplementedException($"未实现指定的服务名称模型适配器：{ServiceKey}。")
-        };
-    } 
 }

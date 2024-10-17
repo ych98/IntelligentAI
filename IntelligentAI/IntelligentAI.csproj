@@ -9,16 +9,16 @@
 	<Description>智能问答业务封装</Description>
 	<Platforms>AnyCPU;x86;x64</Platforms>
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
-	<PackageVersion>0.1.1-beta</PackageVersion>
+	<PackageVersion>1.0.0</PackageVersion>
 	<PackageReleaseNotes>
-		- ApiBase 取消 ApiEnum 校验
-		- 移除和大模型不相关的类
+		- ApiModel => ApiClient
+		- 使用配置文件进行配置
 	</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Azure.AI.OpenAI" Version="2.0.0-beta.5" />
-    <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
+    <PackageReference Include="Azure.AI.OpenAI" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.1" />
   </ItemGroup>
 	
   <ItemGroup>

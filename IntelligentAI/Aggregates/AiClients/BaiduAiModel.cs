@@ -1,20 +1,25 @@
-﻿using IntelligentAI.Records.Kimi;
+﻿using IntelligentAI.Records.Aliyun;
+using IntelligentAI.Records.Baidu;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace IntelligentAI.Aggregates.AiModels;
 
-public class KimiAiModel : AiModelBase
+public class BaiduAiClient(HttpClient httpClient) : AiClientBase(httpClient)
 {
-    public KimiAiModel(IHttpClientFactory httpClientFactory) :base(httpClientFactory)
-    {
-        
-    }
-
     public override async Task<string> AnswerText(
-        string question, 
+        string question,
         Dictionary<string, object>? parameters = null,
-        Records.Universal.Message[]? messages = null, 
+        Records.Universal.Message[]? messages = null,
         CancellationToken cancellation = default)
     {
 
@@ -68,18 +73,32 @@ public class KimiAiModel : AiModelBase
 
         formatParameters["messages"] = new Records.Universal.Message[]
             {
-                new Records.Universal.Message("system","你是 Kimi，由 Moonshot AI 提供的人工智能助手，你更擅长中文和英文的对话。你会为用户提供安全，有帮助，准确的回答。"),
-                new Records.Universal.Message("user",question + "\n" + promptContent)
+                new Records.Universal.Message("user", question + "\n" + promptContent)
             };
 
-        formatParameters["model"] = model.Description;
+        var modelUrl = ConvertToModelUrl(model.Description);
 
-        var aiResult = await CallAsync<Records.Kimi.KimiResult>(ApiEnum.KimiService.Name, "/v1/chat/completions", formatParameters, ApiKey,cancellation: cancellation);
+        var keys = ApiKey.Split(";");
 
-        return aiResult.Choices.FirstOrDefault().Message.Content;
+        var id = keys.First().Substring(keys.First().IndexOf("-") + 1);
+
+        var secret = keys.Last().Substring(keys.Last().IndexOf("-") + 1);
+
+        var token = await GetAsync<BaiduTokenResult>(
+            $"/oauth/2.0/token?grant_type=client_credentials&client_id={id}&client_secret={secret}",
+            cancellation: cancellation);
+
+        var aiResult = await CallAsync<Records.Baidu.BaiduResult>(
+            $"/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/{modelUrl}?access_token={token.AccessToken}",
+            formatParameters,
+            cancellation: cancellation);
+
+        return aiResult.Result;
     }
 
-    public override async IAsyncEnumerable<string> AnswerStream(string question, Dictionary<string, object>? parameters = null,
+    public override async IAsyncEnumerable<string> AnswerStream(
+        string question,
+        Dictionary<string, object>? parameters = null,
         Records.Universal.Message[]? messages = null,
         [EnumeratorCancellation] CancellationToken cancellation = default)
     {
@@ -133,17 +152,29 @@ public class KimiAiModel : AiModelBase
 
         formatParameters["messages"] = new Records.Universal.Message[]
         {
-            new Records.Universal.Message("system","你是 Kimi，由 Moonshot AI 提供的人工智能助手，你更擅长中文和英文的对话。你会为用户提供安全，有帮助，准确的回答。"),
             new Records.Universal.Message("user",question + "\n" + promptContent)
-        };  
+        };
 
-        formatParameters["model"] = model.Description;
+        var modelUrl = ConvertToModelUrl(model.Description);
 
-        await foreach (var single in CallStreamAsync<string>(ApiEnum.KimiService.Name, "/v1/chat/completions", formatParameters, ApiKey, cancellation: cancellation))
+        var keys = ApiKey.Split(";");
+
+        var id = keys.First().Substring(keys.First().IndexOf("-") + 1);
+
+        var secret = keys.Last().Substring(keys.Last().IndexOf("-") + 1);
+
+        var token = await GetAsync<BaiduTokenResult>(
+            $"/oauth/2.0/token?grant_type=client_credentials&client_id={id}&client_secret={secret}",
+            cancellation: cancellation);
+
+        await foreach (var single in CallStreamAsync<string>(
+            $"/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/{modelUrl}?access_token={token.AccessToken}",
+            formatParameters,
+            cancellation: cancellation))
         {
             if (string.IsNullOrWhiteSpace(single)) continue;
 
-            if (!single.StartsWith("data:") || single == "data: [DONE]") continue;
+            if (!single.StartsWith("data:")) continue;
 
             string message = single.Substring(single.IndexOf(':') + 1);
 
@@ -153,11 +184,11 @@ public class KimiAiModel : AiModelBase
 
             try
             {
-                var reply = System.Text.Json.JsonSerializer.Deserialize<KimiResult>(message, option);
+                var reply = System.Text.Json.JsonSerializer.Deserialize<BaiduResult>(message, option);
 
-                if (reply is null || reply?.Choices?.First() is null) continue;
+                if (reply is null || string.IsNullOrWhiteSpace(reply.Result)) continue;
 
-                result = reply?.Choices?.First()?.Delta?.Content?.Replace(@"\\", @"\").Split(@"\n");
+                result = reply.Result.Replace(@"\\", @"\").Split(@"\n");
             }
             catch (System.Text.Json.JsonException ex)
             {
@@ -170,6 +201,7 @@ public class KimiAiModel : AiModelBase
             {
                 yield return string.IsNullOrEmpty(m) ? "\n" : m;
             }
+
         }
 
     }
@@ -195,24 +227,20 @@ public class KimiAiModel : AiModelBase
         {
             nameof(AnswerText) => new Dictionary<string, object>
                 {
-                    // Kimi chat 接口参数
-                    {"model", "moonshot-v1-8k"},
+                    // Baidu chat 接口参数
                     {"messages", new List<Records.Universal.Message>()},
-                    {"temperature", 0.3},
-                    {"presence_penalty", 0},
-                    {"frequency_penalty", 0},
-                    {"top_p", 1.0}
+                    {"temperature", 0.9},
+                    {"penalty_score", 1.0},
+                    {"top_p", 0.7}
                 },
             nameof(AnswerStream) => new Dictionary<string, object>
                 {
-                    // Kimi chat 接口参数
-                    {"model", "moonshot-v1-8k"},
+                    // Baidu chat 接口参数
                     {"messages", new List<Records.Universal.Message>()},
-                    {"temperature", 0.3},
+                    {"temperature", 0.9},
                     {"stream", true},
-                    {"presence_penalty", 0},
-                    {"frequency_penalty", 0},
-                    {"top_p", 1.0}
+                    {"penalty_score", 1.0},
+                    {"top_p", 0.7}
                 },
             _ => throw new ArgumentException($"Unknown method: {method}")
         };
@@ -248,18 +276,38 @@ public class KimiAiModel : AiModelBase
     }
 
     // 存储每个方法的键映射关系 接口输入参数名称 => 传入大模型参数名称
-    private Dictionary<string, Dictionary<string, string>> MethodKeyMappings => new Dictionary<string, Dictionary<string, string>>    {
+    private Dictionary<string, Dictionary<string, string>> MethodKeyMappings
+        => new Dictionary<string, Dictionary<string, string>>
         {
-            nameof(AnswerText), new Dictionary<string, string>
             {
-                {"topP", "top_p"}
+                nameof(AnswerText), new Dictionary<string, string>
+                {
+                    {"topP", "top_p"}
+                }
+            },
+            {
+                nameof(AnswerStream), new Dictionary<string, string>
+                {
+                    {"topP", "top_p"}
+                }
             }
-        },
+        };
+
+    private string ConvertToModelUrl(string description)
+    {
+        return description switch
         {
-            nameof(AnswerStream), new Dictionary<string, string>
-            {
-                {"topP", "top_p"}
-            }
-        }
-    };
+            ModelEnum.ErnieSpeedCode => "ernie_speed",
+            ModelEnum.ErnieSpeedProCode => "ernie-speed-128k",
+            _ => throw new NotImplementedException($"未实现指定的服务名称模型适配器：{ServiceKey}。")
+        };
+    }
 }
+
+public record BaiduTokenResult(
+    [property: System.Text.Json.Serialization.JsonPropertyName("refresh_token")] string RefreshToken,
+    [property: System.Text.Json.Serialization.JsonPropertyName("expires_in")] int Expires,
+    [property: System.Text.Json.Serialization.JsonPropertyName("session_key")] string SessionKey,
+    [property: System.Text.Json.Serialization.JsonPropertyName("access_token")] string AccessToken,
+    [property: System.Text.Json.Serialization.JsonPropertyName("scope")] string Scope,
+    [property: System.Text.Json.Serialization.JsonPropertyName("session_secret")] string SessionSecret);
