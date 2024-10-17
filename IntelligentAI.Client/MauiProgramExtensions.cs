@@ -34,7 +34,11 @@ public static class MauiProgramExtensions
     {
         var apiService = builder.Configuration["INTELLIGENTAI_APISERVICE"] ?? "https+http://apiservice";
 
-        builder.Services.AddAiService(new AiOptions(apiService));
+        builder.Services.AddHttpClient<ModelApiClient>(client =>
+        {
+            client.BaseAddress = new(apiService);
+            client.Timeout = TimeSpan.FromMinutes(5);
+        });
 
         return builder;
     }

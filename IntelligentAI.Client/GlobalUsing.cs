@@ -1,2 +1,1 @@
-﻿global using IntelligentAI.Sdk;
-global using IntelligentAI.Components.Pages.FanewsGroup;
+﻿global using IntelligentAI.Components.Pages.FanewsGroup;

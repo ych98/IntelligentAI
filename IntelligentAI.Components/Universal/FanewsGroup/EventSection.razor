@@ -3,7 +3,7 @@
 @using Models.Search
 
 @inject IToastService ToastService
-@inject IAiModelService ModelService
+@inject ModelApiClient ModelService
 
 @inject FanewsApiClient FanewsApi
 
@@ -98,7 +98,7 @@
 
     private string _selectedMode = "none";
 
-    private string _selectedBaseMode = "1";
+    private string _selectedBaseMode = "0";
 
     private DateTime? _selectedDateFrom = DateTime.Today.AddMonths(-1);
 
@@ -142,7 +142,7 @@
         { new Option<int> { Value = 16, Text = "语义检索 + 提问模型分词 + 辅助词 + 智能检索", Icon = (new Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  ) } },
         { new Option<int> { Value = 17, Text = "语义检索 + 文章凡闻分词 + 辅助词 + 智能检索", Icon = (new Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  ) } },
         { new Option<int> { Value = 18, Text = "语义检索 + 文章模型分词 + 辅助词 + 智能检索", Icon = (new Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  ) } },
-        
+
         { new Option<int> { Value = 19, Text = "语义检索 + 提问凡闻分词 + 智能检索", Icon = (new Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  )} },
         { new Option<int> { Value = 20, Text = "语义检索 + 提问模型分词 + 智能检索", Icon = (new Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  ) } },
         { new Option<int> { Value = 21, Text = "语义检索 + 文章凡闻分词 + 智能检索", Icon = (new Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  ) } },
@@ -300,7 +300,9 @@
                 ContentWordsCount = new IntRange() { From = 200, To = 4000 }
             };
 
-        var events = await FanewsApi.GetEventsAsync(searchArgs, _selectedBaseMode, _selectedMode, cancellation);
+        int.TryParse(_selectedBaseMode, out var selectedBaseMode);
+
+        var events = await FanewsApi.GetEventsAsync(searchArgs, 0, selectedBaseMode, _selectedMode, cancellationToken: cancellation);
 
         return events;
     }

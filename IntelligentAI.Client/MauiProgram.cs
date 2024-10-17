@@ -1,6 +1,4 @@
 ﻿using CommunityToolkit.Maui;
-using IntelligentAI.Enumerations;
-using IntelligentAI.Sdk;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;

@@ -2,7 +2,7 @@
 @using IntelligentAI.Components.Universal.FanewsGroup
 
 @inject IToastService ToastService
-@inject IAiModelService ModelService
+@inject ModelApiClient ModelService
 
 <EventSection OnEventsReceived="ReceiveEventsAsync" SelectedModel="12" />
 
