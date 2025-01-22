@@ -3,6 +3,8 @@ using IntelligentAI.Records.Aliyun;
 using IntelligentAI.Records.Universal;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
+using FluentHttp.Json;
+using System.Linq;
 
 namespace IntelligentAI.Aggregates.AiClients;
 
@@ -81,21 +83,35 @@ public class AliyunAiClient(HttpClient httpClient) : AiClientBase(httpClient)
             messageList.AddRange(messages);
         }
 
+        messageList.Add(new Records.Universal.Message(
+                "user",
+                HtmlUtilities.GetHtmlValue(TextUtilities.EscapePattern(question)) + "\n\n" + promptContent));
+
         formatParameters["input"] = new Dictionary<string, object>
         {
-            {"messages",  messageList.Append(
-                new Records.Universal.Message(
-                    "user",
-                    HtmlUtilities.GetHtmlValue(TextUtilities.EscapePattern(question)) + "\n\n" + promptContent))}
+            {"messages",  messageList}
         };
 
         formatParameters["model"] = model.Description;
 
         var headers = AdditionalHeaders(stream: false);
 
-        var aiResult = await CallAsync<Records.Aliyun.AliyunResult>("/api/v1/services/aigc/text-generation/generation", formatParameters, ApiKey, additionalHeaders: headers, cancellation: cancellation);
+        //var aiResult = await CallAsync<Records.Aliyun.AliyunResult>("/api/v1/services/aigc/text-generation/generation", formatParameters, ApiKey, additionalHeaders: headers, cancellation: cancellation);
 
-        return aiResult.Output.Choices.FirstOrDefault().Message.Content;
+        var aliyunResult = await httpClient
+            .AddAuthentication(
+                scheme: FluentHttpExtensions.BearerScheme,
+                parameter: ApiKey)
+            .AddHeaders(
+                headers.Select(h => new ValueTuple<object, object>(h.Key, h.Value))
+                    .ToArray())
+            .ReadJsonAsync<Dictionary<string, object>, Records.Aliyun.AliyunResult>(
+                url: "/api/v1/services/aigc/text-generation/generation",
+                method: HttpMethod.Post,
+                body: formatParameters,
+                cancellation: cancellation);
+
+        return aliyunResult.Output.Choices.FirstOrDefault().Message.Content;
     }
 
     public override async IAsyncEnumerable<string> AnswerStream(string question, 
@@ -168,23 +184,33 @@ public class AliyunAiClient(HttpClient httpClient) : AiClientBase(httpClient)
             messageList.AddRange(messages);
         }
 
+        messageList.Add(new Records.Universal.Message(
+                "user",
+                HtmlUtilities.GetHtmlValue(TextUtilities.EscapePattern(question)) + "\n\n" + promptContent));
+
         formatParameters["input"] = new Dictionary<string, object>
         {
-            {"messages",  messageList.Append(new Records.Universal.Message(
-                "user",
-                HtmlUtilities.GetHtmlValue(TextUtilities.EscapePattern(question)) + "\n\n" + promptContent))}
+            {"messages",  messageList}
         };
 
         formatParameters["model"] = model.Description;
 
         var headers = AdditionalHeaders(stream: true);
 
-        await foreach (var single in CallStreamAsync<string>(
-            "/api/v1/services/aigc/text-generation/generation", 
-            formatParameters, 
-            ApiKey, 
-            headers, 
-            cancellation: cancellation))
+        var aliyunStream = httpClient
+            .AddAuthentication(
+                scheme: FluentHttpExtensions.BearerScheme,
+                parameter: ApiKey)
+            .AddHeaders(
+                headers.Select(h => new ValueTuple<object, object>(h.Key, h.Value))
+                    .ToArray())
+            .ReadStreamAsync<Dictionary<string, object>, string>(
+                url: "/api/v1/services/aigc/text-generation/generation",
+                method: HttpMethod.Post,
+                body: formatParameters,
+                cancellation: cancellation);
+
+        await foreach (var single in aliyunStream)
         {
             if (string.IsNullOrWhiteSpace(single)) continue;
 

@@ -84,22 +84,25 @@ public static class AiClientFactoryExtensions
 
     public static IServiceCollection AddCustomAiClient<TModel>(
         this IServiceCollection services,
-        string host,
         string serviceName,
-        List<string> models,
-        string apiKey)
+        AIProviderSettings providerSettings)
         where TModel : AiClientBase
     {
         var modelServices = ServiceEnum.GetByName(serviceName);
 
-        var http = new HttpClient() { BaseAddress = new Uri(host) };
+        var http = new HttpClient() { BaseAddress = new Uri(providerSettings.Host) };
 
-        foreach (var modelName in models)
+        foreach (var modelName in providerSettings.Models)
         {
             AiClientBase model = services switch
             {
-                var s when s == ServiceEnum.Aliyun => new AliyunAiClient(http) { ServiceName = serviceName, ModelName = modelName, ApiKey = apiKey },
-                var s when s == ServiceEnum.Kimi => new KimiAiClient(http) { ServiceName = serviceName, ModelName = modelName, ApiKey = apiKey },
+                var s when s == ServiceEnum.Aliyun => new AliyunAiClient(http) { ServiceName = serviceName, ModelName = modelName, ApiKey = providerSettings.ApiKey },
+                var s when s == ServiceEnum.Kimi => new KimiAiClient(http) { ServiceName = serviceName, ModelName = modelName, ApiKey = providerSettings.ApiKey },
+                var s when s == ServiceEnum.Azure => new AzureAiClient(http) { ServiceName = serviceName, ModelName = modelName, ApiKey = providerSettings.ApiKey },
+                var s when s == ServiceEnum.OpenAI => new OpenAiClient(http) { ServiceName = serviceName, ModelName = modelName, ApiKey = providerSettings.ApiKey },
+                var s when s == ServiceEnum.Huoshan => new HuoshanAiClient(http) { ServiceName = serviceName, ModelName = modelName, ApiKey = providerSettings.ApiKey },
+                var s when s == ServiceEnum.Baidu => new BaiduAiClient(http) { ServiceName = serviceName, ModelName = modelName, ApiKey = providerSettings.ApiKey },
+                var s when s == ServiceEnum.Google => new GoogleAiClient(http) { ServiceName = serviceName, ModelName = modelName, ApiKey = providerSettings.ApiKey },
                 _ => throw new NotImplementedException($"未实现指定的服务商模型：{serviceName}。")
             };
 

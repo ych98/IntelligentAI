@@ -43,7 +43,7 @@ public YourClass(IAiModelService model)
 
 var request = new AiArguments("杭州西湖哪里好玩？");
 
-int model = 6; 
+int model = 12; 
 
 var _cts = new CancellationTokenSource();
 
@@ -74,7 +74,7 @@ var stream = _model.AnswerStreamAsync(request, model, cancellationToken: _cts.To
 
 await foreach (var message in stream)
 {
-    streamingContentBuilder.Append(message);
+    streamingContentBuilder.Add(message);
 
     // You can get the answer here
     botAnswer = streamingContentBuilder.ToString(); 

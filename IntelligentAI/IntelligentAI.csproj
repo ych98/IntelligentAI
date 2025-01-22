@@ -11,14 +11,13 @@
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<PackageVersion>1.0.0</PackageVersion>
 	<PackageReleaseNotes>
-		- ApiModel => ApiClient
-		- 使用配置文件进行配置
+		- 使用 Rest Api 进行 Azure 问答
 	</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Azure.AI.OpenAI" Version="2.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.1" />
+    <PackageReference Include="FluentHttp.Json" Version="1.0.2" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.1" />
   </ItemGroup>
 	
   <ItemGroup>

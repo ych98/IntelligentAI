@@ -33,3 +33,14 @@
     <a class="dismiss">🗙</a>
 </div>
 
+@code {
+    LocalizationDirection Direction { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool f)
+    {
+        await base.OnAfterRenderAsync(f);
+        if (!f)
+            return;
+        StateHasChanged();
+    }
+}

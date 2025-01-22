@@ -32,7 +32,7 @@
     @if (_loading)
     {
         <FluentButton style="position: absolute; right: 75px; bottom: 10px; margin-top: 10px;"
-                      IconStart="@(new Icons.Regular.Size16.Dismiss())"
+                      IconStart="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.Dismiss())"
                       Appearance="Appearance.Outline"
                       OnClick="@CancelAsync">
 
@@ -40,7 +40,7 @@
 
     }
     <FluentButton style="position: absolute; right: 25px; bottom: 10px; margin-top: 10px;"
-                  IconStart="@(new Icons.Regular.Size16.ArrowForward())"
+                  IconStart="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.ArrowForward())"
                   Appearance="Appearance.Accent"
                   Loading="@_loading"
                   OnClick="@SendQuestionAsync">

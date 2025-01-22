@@ -7,11 +7,7 @@
     xmlns:mct="clr-namespace:CommunityToolkit.Maui.Behaviors;assembly=CommunityToolkit.Maui"
     BackgroundColor="{DynamicResource PageBackgroundColor}">
 
-    <ContentPage.Behaviors>
-        <mct:StatusBarBehavior StatusBarColor="{StaticResource PageBackgroundColor}" />
-    </ContentPage.Behaviors>
-
-    <BlazorWebView x:Name="blazorWebView" HostPage="wwwroot/index.html">
+    <BlazorWebView HostPage="wwwroot/index.html">
         <BlazorWebView.RootComponents>
             <RootComponent ComponentType="{x:Type local:Components.Routes}" Selector="#app" />
         </BlazorWebView.RootComponents>

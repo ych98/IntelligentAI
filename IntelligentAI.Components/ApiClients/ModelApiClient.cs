@@ -1,44 +1,35 @@
-﻿using IntelligentAI.Abstraction;
+﻿using FluentHttp.Json;
+using IntelligentAI.Abstraction;
 using IntelligentAI.Enumerations;
 using IntelligentAI.Models;
 using System.Runtime.CompilerServices;
+using System.Threading;
 
 namespace IntelligentAI.Components.ApiClients;
 
-public class ModelApiClient(HttpClient httpClient) : ApiClientBase(httpClient)
+public class ModelApiClient(HttpClient httpClient)
 {
     #region Answer
     public async Task<string> AnswerTextAsync(
         AiArguments arguments,
-        int modelEnum = 12,
-        string project = "Default",
-        string? projectDescription = null,
+        int modelEnum = 20,
         CancellationToken cancellationToken = default)
     {
-        string query = ParseQueryString(modelEnum, project, projectDescription);
-
-        string url = $"/Ai/AnswerText?{query}";
-
-        return await CallAsync<AiArguments, string>(           
-            url,
-            arguments,
+        return await httpClient.ReadJsonAsync<string>(
+            url: "/Ai/AnswerText".AppendUrl(("modelEnum", modelEnum)),
+            method: HttpMethod.Post,
+            body: arguments,
             cancellation: cancellationToken);
     }
 
     public async IAsyncEnumerable<string> AnswerStreamAsync(
         AiArguments arguments,
-        int modelEnum = 12,
-        string project = "Default",
-        string? projectDescription = null,
+        int modelEnum = 20,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        string query = ParseQueryString(modelEnum, project, projectDescription);
-
-        // 调用API的URL
-        string url = $"/Ai/AnswerStream?{query}";
-
-        await foreach (var message in CallStreamAsync<AiArguments, string>(           
-            url,
+        await foreach (var message in httpClient.ReadStreamAsync<string>(
+            url: "/Ai/AnswerStream".AppendUrl(("modelEnum", modelEnum)),
+            method: HttpMethod.Post,
             arguments,
             cancellation: cancellationToken))
         {
@@ -48,17 +39,12 @@ public class ModelApiClient(HttpClient httpClient) : ApiClientBase(httpClient)
 
     public async IAsyncEnumerable<string> AnswerStringsAsync(
         AiArguments arguments,
-        int modelEnum = 12,
-        string project = "Default",
-        string? projectDescription = null,
+        int modelEnum = 20,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        string query = ParseQueryString(modelEnum, project, projectDescription);
-
-        string url = $"/Ai/AnswerStrings?{query}";
-
-        await foreach (var message in CallStringsAsync<AiArguments, string>(           
-            url,
+        await foreach (var message in httpClient.ReadStreamAsync<string>(
+            url: "/Ai/AnswerStrings".AppendUrl(("modelEnum", modelEnum)),
+            method: HttpMethod.Post,
             arguments,
             cancellation: cancellationToken))
         {
@@ -68,17 +54,12 @@ public class ModelApiClient(HttpClient httpClient) : ApiClientBase(httpClient)
 
     public async IAsyncEnumerable<AiProgressResult> AnswerProgressAsync(
         List<AiArguments> requests,
-        int modelEnum = 12,
-        string project = "Default",
-        string? projectDescription = null,
+        int modelEnum = 20,
         [EnumeratorCancellation] CancellationToken cancellation = default)
     {
-        string query = ParseQueryString(modelEnum, project, projectDescription);
-
-        string url = $"/Ai/AnswerProgress?{query}";
-
-        await foreach (var message in CallStringsAsync<List<AiArguments>, AiProgressResult>(           
-            url,
+        await foreach (var message in httpClient.ReadStreamAsync<AiProgressResult>(
+            url: "/Ai/AnswerProgress".AppendUrl(("modelEnum", modelEnum)),
+            method: HttpMethod.Post,
             requests,
             cancellation: cancellation))
         {
@@ -87,21 +68,5 @@ public class ModelApiClient(HttpClient httpClient) : ApiClientBase(httpClient)
     }
 
     #endregion
-
-    private string ParseQueryString(
-        int modelEnum = 12,
-        string project = "Default",
-        string? projectDescription = null)
-    {
-        string query = string.Empty;
-
-        var urlArguments = System.Web.HttpUtility.ParseQueryString(query);
-        urlArguments["modelEnum"] = modelEnum.ToString();
-        urlArguments["project"] = project;
-        urlArguments["projectDescription"] = projectDescription;
-        query = urlArguments.ToString();
-
-        return query;
-    }
 
 }

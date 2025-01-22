@@ -1,4 +1,5 @@
-﻿using IntelligentAI.Abstraction;
+﻿using FluentHttp.Json;
+using IntelligentAI.Abstraction;
 using IntelligentAI.Components.Pages.FanewsGroup;
 using IntelligentAI.Enumerations;
 using System;
@@ -11,17 +12,14 @@ using System.Threading.Tasks;
 
 namespace IntelligentAI.Components.ApiClients;
 
-public class XueqiuApiClient(HttpClient httpClient) : ApiClientBase(httpClient)
+public class XueqiuApiClient(HttpClient httpClient)
 {
     public async Task<EventResult[]> GetEventsAsync(Models.Search.SearchArgs arguments, string mode, string including, CancellationToken cancellationToken = default)
     {
-        List<EventResult>? events = null;
-
-        string url = $"/FanewsSearch/GetAdditionalEvents?mode={mode}&including={including}&count=3";
-
-        return await CallAsync<Models.Search.SearchArgs, EventResult[]>(
-            url,
-            arguments,
+        return await httpClient.ReadJsonAsync<Models.Search.SearchArgs, EventResult[]>(
+            url: "/FanewsSearch/GetAdditionalEvents".AppendUrl(("mode", mode),("including", including), ("count", 3)),
+            method: HttpMethod.Post,
+            body: arguments,
             cancellation: cancellationToken);
     }
 }

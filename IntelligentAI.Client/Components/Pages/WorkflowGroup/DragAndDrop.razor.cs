@@ -40,9 +40,3 @@ public partial class DragAndDrop
     }
 }
 
-public class BotAnswerNode : NodeModel
-{
-    public BotAnswerNode(Blazor.Diagrams.Core.Geometry.Point position = null) : base(position) { }
-
-    public string Answer { get; set; }
-}

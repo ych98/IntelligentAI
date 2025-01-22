@@ -10,6 +10,7 @@ public static class MauiProgram
 {
     public static MauiApp CreateMauiApp()
     {
+
         var builder = MauiApp.CreateBuilder();
 
         builder
@@ -44,6 +45,11 @@ public static class MauiProgram
 
         MauiApp mauiApp = builder.Build();
         mauiApp.InitOpenTelemetryServices();
+
+        // Set this switch to use the LEGACY behavior of always using 0.0.0.0 to host BlazorWebView
+        //AppContext.SetSwitch("BlazorWebView.AppHostAddressAlways0000", true);
+
         return mauiApp;
+
     }
 }

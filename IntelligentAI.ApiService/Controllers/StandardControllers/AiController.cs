@@ -152,6 +152,16 @@ public class AiController : ControllerBase
         return Ok(message);
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="requests"></param>
+    /// <param name="modelEnum"></param>
+    /// <param name="eventId"></param>
+    /// <param name="parentTaskId"></param>
+    /// <param name="taskName"></param>
+    /// <param name="cancellation"></param>
+    /// <returns></returns>
     [HttpPost]
     public async IAsyncEnumerable<AiProgressResult> AnswerProgressAsync(
     [FromBody] List<AiArguments> requests,

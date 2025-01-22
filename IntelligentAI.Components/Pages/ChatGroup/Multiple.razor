@@ -54,7 +54,7 @@
         <div style="position: relative; width: 100%;">
             <!-- ClearAsync Button outside the input box on the left -->
             <FluentButton style="position: absolute; top: 50%; transform: translateY(-50%);"
-                          IconStart="@(new Icons.Regular.Size16.ArrowClockwise())"
+                          IconStart="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.ArrowClockwise())"
                           Appearance="Appearance.Accent"
                           OnClick="ClearAsync">
             </FluentButton>
@@ -73,7 +73,7 @@
             {
                 <!-- Cancel Button -->
                 <FluentButton style="position: absolute; right: 65px; bottom: 10px;"
-                              IconStart="@(new Icons.Regular.Size16.Dismiss())"
+                              IconStart="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.Dismiss())"
                               Appearance="Appearance.Outline"
                               OnClick="@CancelAsync">
                 </FluentButton>
@@ -81,7 +81,7 @@
 
             <!-- SendQuestionAsync Button inside the input box on the right bottom corner -->
             <FluentButton style="position: absolute; right: 15px; bottom: 10px;"
-                          IconStart="@(new Icons.Regular.Size16.Send())"
+                          IconStart="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.Send())"
                           Appearance="Appearance.Accent"
                           Loading="@_loading"
                           OnClick="@SendQuestionAsync">
@@ -106,12 +106,12 @@
 
     public List<Option<string>> PromptOptions = new()
     {
-        { new Option<string> { Value = "question", Text = "智能助手", Icon = (new Icons.Regular.Size16.ChatBubblesQuestion(), Color.Neutral, "start"  ), Selected = true } },
-        { new Option<string> { Value = "heart", Text = "恋爱大师", Icon = (new Icons.Regular.Size16.ChatMultipleHeart(), Color.Neutral, "start"  ) } },
-        { new Option<string> { Value = "sparkle", Text = "创意大师", Icon = (new Icons.Regular.Size16.ChatSparkle(), Color.Neutral, "start"  ) } },
-        { new Option<string> { Value = "code", Text = "编程专家", Icon = (new Icons.Regular.Size16.CodeBlock(), Color.Neutral, "start"  ) } },
-        { new Option<string> { Value = "food", Text = "美食烹饪家", Icon = (new Icons.Regular.Size16.Food(), Color.Neutral, "start"  ) } },
-        { new Option<string> { Value = "translate", Text = "翻译大师", Icon = (new Icons.Regular.Size16.Translate(), Color.Neutral, "start"  ) } }
+        { new Option<string> { Value = "question", Text = "智能助手", Icon = (new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.ChatBubblesQuestion(), Color.Neutral, "start"  ), Selected = true } },
+        { new Option<string> { Value = "heart", Text = "恋爱大师", Icon = (new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.ChatMultipleHeart(), Color.Neutral, "start"  ) } },
+        { new Option<string> { Value = "sparkle", Text = "创意大师", Icon = (new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.ChatSparkle(), Color.Neutral, "start"  ) } },
+        { new Option<string> { Value = "code", Text = "编程专家", Icon = (new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.CodeBlock(), Color.Neutral, "start"  ) } },
+        { new Option<string> { Value = "food", Text = "美食烹饪家", Icon = (new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.Food(), Color.Neutral, "start"  ) } },
+        { new Option<string> { Value = "translate", Text = "翻译大师", Icon = (new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.Translate(), Color.Neutral, "start"  ) } }
     };
 
     private string _inputMessage;
@@ -175,7 +175,7 @@
         {
             _loading = true; await InvokeAsync(StateHasChanged);
 
-            await foreach (var message in ModelService.AnswerStringsAsync(request, cancellationToken: _cts.Token))
+            await foreach (var message in ModelService.AnswerStringsAsync(request, modelEnum: 20, cancellationToken: _cts.Token))
             {
                 if (string.IsNullOrEmpty(message))
                 {

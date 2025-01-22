@@ -1,9 +1,15 @@
-﻿using IntelligentAI.Abstraction;
+﻿using FluentHttp.Json;
+using IntelligentAI.Abstraction;
+using IntelligentAI.Enumerations;
+using IntelligentAI.Models;
+using Microsoft.VisualBasic;
+using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Threading;
 
 namespace IntelligentAI.Components.ApiClients;
 
-public class FanewsApiClient(HttpClient httpClient) : ApiClientBase(httpClient)
+public class FanewsApiClient(HttpClient httpClient)
 {
     public async Task<EventResult[]> GetEventsAsync(
         Models.Search.SearchArgs arguments, 
@@ -13,13 +19,11 @@ public class FanewsApiClient(HttpClient httpClient) : ApiClientBase(httpClient)
         string project = "Default",
         CancellationToken cancellationToken = default)
     {
-        string query = ParseQueryString(mode, including, channelId, project);
-
-        string url = $"/FanewsSearch/GetAdditionalEvents?{query}";
-
-        return await CallAsync<Models.Search.SearchArgs, EventResult[]>(
-            url,
-            arguments,
+        return await httpClient.ReadJsonAsync<Models.Search.SearchArgs, EventResult[]>(
+            url: "/FanewsSearch/GetAdditionalEvents"
+                .AppendUrl(("mode", mode), ("including", including), ("channelId", channelId), ("project", project)),
+            method: HttpMethod.Post,
+            body: arguments,
             cancellation: cancellationToken);
     }
 
@@ -27,10 +31,10 @@ public class FanewsApiClient(HttpClient httpClient) : ApiClientBase(httpClient)
 
     public async Task<string> GetPromptAsync(string id, CancellationToken cancellation = default)
     {
-        string url = $"/Business/GetPrompt?id={id}";
-
-        return await GetAsync<string>(
-            url,
+        return await httpClient.ReadJsonAsync<string>(
+            url: "/Business/GetPrompt"
+                .AppendUrl(("id", id)),
+            method: HttpMethod.Get,
             cancellation: cancellation);
     }
 
@@ -40,11 +44,11 @@ public class FanewsApiClient(HttpClient httpClient) : ApiClientBase(httpClient)
         Dictionary<string, string>? replaces,
         CancellationToken cancellation = default)
     {
-        string url = $"/FanewsBusiness/GetPrompt?id={id}";
-
-        return await CallAsync<Dictionary<string, string>, string>(
-            url,
-            replaces,
+        return await httpClient.ReadJsonAsync< Dictionary<string, string>,string>(
+            url: "/FanewsBusiness/GetPrompt"
+                .AppendUrl(("id", id)),
+            method: HttpMethod.Post,
+            body: replaces,
             cancellation: cancellation);
     }
 
@@ -54,42 +58,39 @@ public class FanewsApiClient(HttpClient httpClient) : ApiClientBase(httpClient)
 
     public async Task<string[]> DeduplicateAsync(string[] strings, string methodName = "NormalizedLevenshtein", double similarityThreshold = 0.6, CancellationToken cancellation = default)
     {
-        string url = $"/Text/Deduplicate?methodName={methodName}&similarityThreshold={similarityThreshold}";
-
-        return await CallAsync<string[], string[]>(
-            url,
-            strings,
+        return await httpClient.ReadJsonAsync<string[], string[]>(
+            url: "/Text/Deduplicate"
+                .AppendUrl(("methodName", methodName), ("similarityThreshold", similarityThreshold)),
+            method: HttpMethod.Post,
+            body: strings,
             cancellation: cancellation);
     }
 
     public async Task<string[]> GetContentsAsync(string html, CancellationToken cancellation = default)
     {
-        string url = $"/Html/GetTextArray";
-
-        return await CallAsync<string, string[]>(
-            url,
-            html,
+        return await httpClient.ReadJsonAsync<string, string[]>(
+            url: $"/Html/GetTextArray",
+            method: HttpMethod.Post,
+            body: html,
             cancellation: cancellation);
     }
 
     public async Task<double[]> GetVectorAsync(string input, CancellationToken cancellation = default)
     {
-        string url = $"/Text/GetVector";
-
-        return await CallAsync<string, double[]>(
-            url,
-            input,
+        return await httpClient.ReadJsonAsync<string, double[]>(
+            url: $"/Text/GetVector",
+            method: HttpMethod.Post,
+            body: input,
             cancellation: cancellation);
     }
 
 
     public async Task<string> GetTranslationAsync(string input, CancellationToken cancellation = default)
     {
-        string url = $"/Text/GetTranslation";
-
-        return await CallAsync<string, string>(
-            url,
-            input,
+        return await httpClient.ReadJsonAsync<string, string>(
+            url: $"/Text/GetTranslation",
+            method: HttpMethod.Post,
+            body: input,
             cancellation: cancellation);
     }
 
@@ -104,14 +105,12 @@ public class FanewsApiClient(HttpClient httpClient) : ApiClientBase(httpClient)
         string project = "Default",
         CancellationToken cancellation = default)
     {
-        string url = $"/FanewsBusiness/AnswerTextByPrompt?id={id}&project={project}&modelEnum={modelEnum}";
-
-        var answer = await CallAsync<Dictionary<string, string>, string>(
-            url,
-            replaces,
+        return await httpClient.ReadJsonAsync<Dictionary<string, string>, string>(
+            url: "/FanewsBusiness/AnswerTextByPrompt"
+                .AppendUrl(("id", id), ("project", project), ("modelEnum", modelEnum)),
+            method: HttpMethod.Post,
+            body: replaces,
             cancellation: cancellation);
-
-        return answer;
     }
 
     public async IAsyncEnumerable<string> AnswerStringsByPromptAsync(
@@ -121,12 +120,14 @@ public class FanewsApiClient(HttpClient httpClient) : ApiClientBase(httpClient)
         string project = "Default",
         [EnumeratorCancellation] CancellationToken cancellation = default)
     {
-        string url = $"/FanewsBusiness/AnswerStringsByPrompt?id={id}&project={project}&modelEnum={modelEnum}";
+        var stream = httpClient.ReadStreamAsync<Dictionary<string, string>, string>(
+            url: "/FanewsBusiness/AnswerStringsByPrompt"
+                .AppendUrl(("id", id), ("project", project), ("modelEnum", modelEnum)),
+            method: HttpMethod.Post,
+            body: replaces,
+            cancellation: cancellation);
 
-        await foreach (var message in CallStringsAsync<Dictionary<string, string>, string>(
-            url,
-            replaces,
-            cancellation: cancellation))
+        await foreach (var message in stream)
         {
             yield return message;
         }
@@ -136,15 +137,12 @@ public class FanewsApiClient(HttpClient httpClient) : ApiClientBase(httpClient)
        string input,
        CancellationToken cancellationToken = default)
     {
-        string url = $"/FanewsAiFunction/GetCoreWords";
-
-        var result = await CallAsync<string, string>(
-
-            url,
-            input,
+        return await httpClient.ReadJsonAsync<string, string>(
+            url: "/FanewsAiFunction/GetCoreWords",
+            method: HttpMethod.Post,
+            body: input,
             cancellation: cancellationToken);
 
-        return result;
     }
 
 
@@ -156,36 +154,14 @@ public class FanewsApiClient(HttpClient httpClient) : ApiClientBase(httpClient)
         string content,
         CancellationToken cancellation = default)
     {
-        string url = $"/Analyze/GetNameExtraction";
-
-        var answer = await CallAsync<string, Dictionary<string, HashSet<string>>>(
-
-            url,
-            content,
-            cancellation: cancellation);
-
-        return answer;
+        return await httpClient.ReadJsonAsync<string, Dictionary<string, HashSet<string>>>(
+           url: "/Analyze/GetNameExtraction",
+           method: HttpMethod.Post,
+           body: content,
+           cancellation: cancellation);
     }
 
     #endregion
-
-    private string ParseQueryString(
-    int mode = 4,
-    string including = "none",
-    int channelId = 0,
-    string project = "Default")
-    {
-        string query = string.Empty;
-
-        var urlArguments = System.Web.HttpUtility.ParseQueryString(query);
-        urlArguments["mode"] = mode.ToString();
-        urlArguments["including"] = including;
-        urlArguments["channelId"] = channelId.ToString();
-        urlArguments["project"] = project;
-        query = urlArguments.ToString();
-
-        return query;
-    }
 
 }
 

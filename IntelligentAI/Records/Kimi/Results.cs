@@ -23,6 +23,3 @@ public record Choice(
     [property: System.Text.Json.Serialization.JsonPropertyName("delta")] Delta? Delta,
     [property: System.Text.Json.Serialization.JsonPropertyName("finish_reason")] string? FinishReason,
     [property: System.Text.Json.Serialization.JsonPropertyName("usage")] Usage? Usage);
-
-public record Delta(
-    [property: System.Text.Json.Serialization.JsonPropertyName("content")] string? Content);

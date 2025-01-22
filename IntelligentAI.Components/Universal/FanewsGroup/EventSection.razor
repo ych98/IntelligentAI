@@ -3,6 +3,7 @@
 @using Models.Search
 
 @inject IToastService ToastService
+
 @inject ModelApiClient ModelService
 
 @inject FanewsApiClient FanewsApi
@@ -76,14 +77,14 @@
     @if (Loading)
     {
         <FluentButton style="position: absolute; right: 65px; bottom: 10px; margin-top: 10px;"
-                      IconStart="@(new Icons.Regular.Size16.Dismiss())"
+                      IconStart="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.Dismiss())"
                       Appearance="Appearance.Outline"
                       OnClick="@CancelAsync">
 
         </FluentButton>
     }
     <FluentButton style="position: absolute; right: 15px; bottom: 10px; margin-top: 10px;"
-                  IconStart="@(new Icons.Regular.Size16.ArrowForward())"
+                  IconStart="@(new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.ArrowForward())"
                   Appearance="Appearance.Accent"
                   Loading="@Loading"
                   OnClick="@SendQuestionAsync">
@@ -107,7 +108,7 @@
     private readonly Array _allResourceTypes = System.Enum.GetValues(typeof(Models.Search.GroupArticleType));
 
     private IEnumerable<string> _allTypes => _allResourceTypes.OfType<Models.Search.GroupArticleType>()
-        .Where(type => (int)type > 0 && (int)type < 6)
+        .Where(type => (int)type > 0 && (int)type < 10)
         .Select(type => type.ToString());
 
     private HashSet<string> _visibleResourceTypes = new HashSet<string>();
@@ -122,57 +123,69 @@
 
     public List<Option<string>> AdditionalModeOptions = new()
     {
-        { new Option<string> { Value = "none", Text = "无", Icon = (new Icons.Regular.Size16.AnimalRabbit(), Color.Neutral, "start"  ), Selected = true } },
-        { new Option<string> { Value = "all", Text = "脉络时间，脉络标题，脉络概要", Icon = (new Icons.Regular.Size16.AnimalRabbit(), Color.Neutral, "start"  ) } },
-        { new Option<string> { Value = "event", Text = "脉络时间", Icon = (new Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  ) } },
-        { new Option<string> { Value = "abstraction", Text = "脉络标题，脉络概要", Icon = (new Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  ) } },
+        { new Option<string> { Value = "none", Text = "无", Icon = (new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.AnimalRabbit(), Color.Neutral, "start"  ), Selected = true } },
+        { new Option<string> { Value = "all", Text = "脉络时间，脉络标题，脉络概要", Icon = (new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.AnimalRabbit(), Color.Neutral, "start"  ) } },
+        { new Option<string> { Value = "event", Text = "脉络时间", Icon = (new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  ) } },
+        { new Option<string> { Value = "abstraction", Text = "脉络标题，脉络概要", Icon = (new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  ) } },
     };
 
     public List<Option<int>> EventOptions = new()
     {
-        { new Option<int> { Value = 1, Text = "语义检索", Icon = (new Icons.Regular.Size16.AnimalRabbit(), Color.Neutral, "start"  ), Selected = true } },
-        { new Option<int> { Value = 2, Text = "智能检索", Icon = (new Icons.Regular.Size16.AnimalRabbit(), Color.Neutral, "start"  ) } },
+        { new Option<int> { Value = 0, Text = "默认检索", Icon = (new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.AnimalRabbit(), Color.Neutral, "start"  ), Selected = true } },
 
-        { new Option<int> { Value = 11, Text = "语义检索 + 提问凡闻分词 + 高级检索", Icon = (new Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  ) } },
-        { new Option<int> { Value = 12, Text = "语义检索 + 提问模型分词 + 高级检索", Icon = (new Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  ) } },
-        { new Option<int> { Value = 13, Text = "语义检索 + 文章凡闻分词 + 高级检索", Icon = (new Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  ) } },
-        { new Option<int> { Value = 14, Text = "语义检索 + 文章模型分词 + 高级检索", Icon = (new Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  ) } },
+        { new Option<int> { Value = 1, Text = "语义检索", Icon = (new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.AnimalRabbit(), Color.Neutral, "start"  ) } },
+        { new Option<int> { Value = 2, Text = "智能检索", Icon = (new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.AnimalRabbit(), Color.Neutral, "start"  ) } },
+        { new Option<int> { Value = 3, Text = "组织人物 + 辅助词 + 智能检索", Icon = (new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.AnimalRabbit(), Color.Neutral, "start"  ) } },
+        { new Option<int> { Value = 4, Text = "前三个词 + 辅助词 + 智能检索", Icon = (new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.AnimalRabbit(), Color.Neutral, "start"  ) } },
+        { new Option<int> { Value = 5, Text = "提问模型分词 + 前三个词 + 辅助词 + 智能检索", Icon = (new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.AnimalRabbit(), Color.Neutral, "start"  ) } },
 
-        { new Option<int> { Value = 15, Text = "语义检索 + 提问凡闻分词 + 辅助词 + 智能检索", Icon = (new Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  )} },
-        { new Option<int> { Value = 16, Text = "语义检索 + 提问模型分词 + 辅助词 + 智能检索", Icon = (new Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  ) } },
-        { new Option<int> { Value = 17, Text = "语义检索 + 文章凡闻分词 + 辅助词 + 智能检索", Icon = (new Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  ) } },
-        { new Option<int> { Value = 18, Text = "语义检索 + 文章模型分词 + 辅助词 + 智能检索", Icon = (new Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  ) } },
+        { new Option<int> { Value = 9, Text = "提问模型分词 + 高级搜索", Icon = (new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.AnimalRabbit(), Color.Neutral, "start"  ) } },
+        { new Option<int> { Value = 10, Text = "高级搜索", Icon = (new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.AnimalRabbit(), Color.Neutral, "start"  ) } },
 
-        { new Option<int> { Value = 19, Text = "语义检索 + 提问凡闻分词 + 智能检索", Icon = (new Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  )} },
-        { new Option<int> { Value = 20, Text = "语义检索 + 提问模型分词 + 智能检索", Icon = (new Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  ) } },
-        { new Option<int> { Value = 21, Text = "语义检索 + 文章凡闻分词 + 智能检索", Icon = (new Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  ) } },
-        { new Option<int> { Value = 22, Text = "语义检索 + 文章模型分词 + 智能检索", Icon = (new Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  ) } },
+        { new Option<int> { Value = 11, Text = "语义检索 + 提问凡闻分词 + 高级检索", Icon = (new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  ) } },
+        { new Option<int> { Value = 12, Text = "语义检索 + 提问模型分词 + 高级检索", Icon = (new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  ) } },
+        { new Option<int> { Value = 13, Text = "语义检索 + 文章凡闻分词 + 高级检索", Icon = (new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  ) } },
+        { new Option<int> { Value = 14, Text = "语义检索 + 文章模型分词 + 高级检索", Icon = (new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  ) } },
 
-        { new Option<int> { Value = 31, Text = "智能检索 + 文章模型摘要 + 语义检索", Icon = (new Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  ) } },
-        { new Option<int> { Value = 32, Text = "智能检索 + 文章凡闻摘要 + 语义检索", Icon = (new Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  ) } },
+        { new Option<int> { Value = 15, Text = "语义检索 + 提问凡闻分词 + 辅助词 + 智能检索", Icon = (new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  )} },
+        { new Option<int> { Value = 16, Text = "语义检索 + 提问模型分词 + 辅助词 + 智能检索", Icon = (new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  ) } },
+        { new Option<int> { Value = 17, Text = "语义检索 + 文章凡闻分词 + 辅助词 + 智能检索", Icon = (new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  ) } },
+        { new Option<int> { Value = 18, Text = "语义检索 + 文章模型分词 + 辅助词 + 智能检索", Icon = (new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  ) } },
 
-        { new Option<int> { Value = 51, Text = "智能检索 + 首篇文章 + 语义检索 + 提问凡闻分词 + 高级检索", Icon = (new Icons.Regular.Size16.AnimalCat(), Color.Neutral, "start"  ) } },
-        { new Option<int> { Value = 52, Text = "智能检索 + 首篇文章 + 语义检索 + 提问模型分词 + 高级检索", Icon = (new Icons.Regular.Size16.AnimalCat(), Color.Neutral, "start"  ) } },
-        { new Option<int> { Value = 53, Text = "智能检索 + 首篇文章 + 语义检索 + 文章凡闻分词 + 高级检索", Icon = (new Icons.Regular.Size16.AnimalCat(), Color.Neutral, "start"  ) } },
-        { new Option<int> { Value = 54, Text = "智能检索 + 首篇文章 + 语义检索 + 文章模型分词 + 高级检索", Icon = (new Icons.Regular.Size16.AnimalCat(), Color.Neutral, "start"  ) } },
+        { new Option<int> { Value = 19, Text = "语义检索 + 提问凡闻分词 + 智能检索", Icon = (new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  )} },
+        { new Option<int> { Value = 20, Text = "语义检索 + 提问模型分词 + 智能检索", Icon = (new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  ) } },
+        { new Option<int> { Value = 21, Text = "语义检索 + 文章凡闻分词 + 智能检索", Icon = (new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  ) } },
+        { new Option<int> { Value = 22, Text = "语义检索 + 文章模型分词 + 智能检索", Icon = (new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  ) } },
 
-        { new Option<int> { Value = 55, Text = "智能检索 + 首篇文章 + 语义检索 + 提问凡闻分词 + 辅助词 + 智能检索", Icon = (new Icons.Regular.Size16.AnimalCat(), Color.Neutral, "start"  )} },
-        { new Option<int> { Value = 56, Text = "智能检索 + 首篇文章 + 语义检索 + 提问模型分词 + 辅助词 + 智能检索", Icon = (new Icons.Regular.Size16.AnimalCat(), Color.Neutral, "start"  ) } },
-        { new Option<int> { Value = 57, Text = "智能检索 + 首篇文章 + 语义检索 + 文章凡闻分词 + 辅助词 + 智能检索", Icon = (new Icons.Regular.Size16.AnimalCat(), Color.Neutral, "start"  ) } },
-        { new Option<int> { Value = 58, Text = "智能检索 + 首篇文章 + 语义检索 + 文章模型分词 + 辅助词 + 智能检索", Icon = (new Icons.Regular.Size16.AnimalCat(), Color.Neutral, "start"  ) } },
+        { new Option<int> { Value = 31, Text = "智能检索 + 文章模型摘要 + 语义检索", Icon = (new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  ) } },
+        { new Option<int> { Value = 32, Text = "智能检索 + 文章凡闻摘要 + 语义检索", Icon = (new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  ) } },
+        { new Option<int> { Value = 33, Text = "辅助词 + 智能检索 + 文章模型摘要 + 语义检索", Icon = (new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  ) } },
+        { new Option<int> { Value = 34, Text = "辅助词 + 智能检索 + 文章凡闻摘要 + 语义检索", Icon = (new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.AnimalDog(), Color.Neutral, "start"  ) } },
 
-        { new Option<int> { Value = 59, Text = "智能检索 + 首篇文章 + 语义检索 + 提问凡闻分词 + 智能检索", Icon = (new Icons.Regular.Size16.AnimalCat(), Color.Neutral, "start"  )} },
-        { new Option<int> { Value = 60, Text = "智能检索 + 首篇文章 + 语义检索 + 提问模型分词 + 智能检索", Icon = (new Icons.Regular.Size16.AnimalCat(), Color.Neutral, "start"  ) } },
-        { new Option<int> { Value = 61, Text = "智能检索 + 首篇文章 + 语义检索 + 文章凡闻分词 + 智能检索", Icon = (new Icons.Regular.Size16.AnimalCat(), Color.Neutral, "start"  ) } },
-        { new Option<int> { Value = 62, Text = "智能检索 + 首篇文章 + 语义检索 + 文章模型分词 + 智能检索", Icon = (new Icons.Regular.Size16.AnimalCat(), Color.Neutral, "start"  ) } },
+        { new Option<int> { Value = 51, Text = "智能检索 + 首篇文章 + 语义检索 + 提问凡闻分词 + 高级检索", Icon = (new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.AnimalCat(), Color.Neutral, "start"  ) } },
+        { new Option<int> { Value = 52, Text = "智能检索 + 首篇文章 + 语义检索 + 提问模型分词 + 高级检索", Icon = (new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.AnimalCat(), Color.Neutral, "start"  ) } },
+        { new Option<int> { Value = 53, Text = "智能检索 + 首篇文章 + 语义检索 + 文章凡闻分词 + 高级检索", Icon = (new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.AnimalCat(), Color.Neutral, "start"  ) } },
+        { new Option<int> { Value = 54, Text = "智能检索 + 首篇文章 + 语义检索 + 文章模型分词 + 高级检索", Icon = (new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.AnimalCat(), Color.Neutral, "start"  ) } },
 
-        { new Option<int> { Value = 71, Text = "语义检索 + 文章模型分词 + 智能检索 + 文章模型摘要 + 语义检索", Icon = (new Icons.Regular.Size16.AnimalCat(), Color.Neutral, "start"  ) } },
-        { new Option<int> { Value = 72, Text = "语义检索 + 文章凡闻分词 + 智能检索 + 文章凡闻摘要 + 语义检索", Icon = (new Icons.Regular.Size16.AnimalCat(), Color.Neutral, "start"  ) } },
+        { new Option<int> { Value = 55, Text = "智能检索 + 首篇文章 + 语义检索 + 提问凡闻分词 + 辅助词 + 智能检索", Icon = (new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.AnimalCat(), Color.Neutral, "start"  )} },
+        { new Option<int> { Value = 56, Text = "智能检索 + 首篇文章 + 语义检索 + 提问模型分词 + 辅助词 + 智能检索", Icon = (new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.AnimalCat(), Color.Neutral, "start"  ) } },
+        { new Option<int> { Value = 57, Text = "智能检索 + 首篇文章 + 语义检索 + 文章凡闻分词 + 辅助词 + 智能检索", Icon = (new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.AnimalCat(), Color.Neutral, "start"  ) } },
+        { new Option<int> { Value = 58, Text = "智能检索 + 首篇文章 + 语义检索 + 文章模型分词 + 辅助词 + 智能检索", Icon = (new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.AnimalCat(), Color.Neutral, "start"  ) } },
 
-        { new Option<int> { Value = 91, Text = "分词判断 + 自动模式", Icon = (new Icons.Regular.Size16.AnimalTurtle(), Color.Neutral, "start"  ) } },
-        { new Option<int> { Value = 92, Text = "分词判断 + 自动模式 + 精准检索", Icon = (new Icons.Regular.Size16.AnimalTurtle(), Color.Neutral, "start"  ) } },
-        { new Option<int> { Value = 93, Text = "字数判断 + 自动模式 + 精准检索", Icon = (new Icons.Regular.Size16.AnimalTurtle(), Color.Neutral, "start"  ) } },
-        { new Option<int> { Value = 0, Text = "字数判断 + 自动模式", Icon = (new Icons.Regular.Size16.AnimalTurtle(), Color.Neutral, "start"  ) } },
+        { new Option<int> { Value = 59, Text = "智能检索 + 首篇文章 + 语义检索 + 提问凡闻分词 + 智能检索", Icon = (new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.AnimalCat(), Color.Neutral, "start"  )} },
+        { new Option<int> { Value = 60, Text = "智能检索 + 首篇文章 + 语义检索 + 提问模型分词 + 智能检索", Icon = (new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.AnimalCat(), Color.Neutral, "start"  ) } },
+        { new Option<int> { Value = 61, Text = "智能检索 + 首篇文章 + 语义检索 + 文章凡闻分词 + 智能检索", Icon = (new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.AnimalCat(), Color.Neutral, "start"  ) } },
+        { new Option<int> { Value = 62, Text = "智能检索 + 首篇文章 + 语义检索 + 文章模型分词 + 智能检索", Icon = (new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.AnimalCat(), Color.Neutral, "start"  ) } },
+
+        { new Option<int> { Value = 71, Text = "语义检索 + 文章模型分词 + 智能检索 + 文章模型摘要 + 语义检索", Icon = (new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.AnimalCat(), Color.Neutral, "start"  ) } },
+        { new Option<int> { Value = 72, Text = "语义检索 + 文章凡闻分词 + 智能检索 + 文章凡闻摘要 + 语义检索", Icon = (new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.AnimalCat(), Color.Neutral, "start"  ) } },
+        { new Option<int> { Value = 73, Text = "语义检索 + 文章模型分词 + 辅助词 + 智能检索 + 文章模型摘要 + 语义检索", Icon = (new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.AnimalCat(), Color.Neutral, "start"  ) } },
+        { new Option<int> { Value = 74, Text = "语义检索 + 文章凡闻分词 + 辅助词 + 智能检索 + 文章凡闻摘要 + 语义检索", Icon = (new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.AnimalCat(), Color.Neutral, "start"  ) } },
+
+        { new Option<int> { Value = 91, Text = "分词判断 + 自动模式", Icon = (new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.AnimalTurtle(), Color.Neutral, "start"  ) } },
+        { new Option<int> { Value = 92, Text = "分词判断 + 自动模式 + 精准检索", Icon = (new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.AnimalTurtle(), Color.Neutral, "start"  ) } },
+        { new Option<int> { Value = 93, Text = "字数判断 + 自动模式", Icon = (new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.AnimalTurtle(), Color.Neutral, "start"  ) } },
+        { new Option<int> { Value = 94, Text = "字数判断 + 自动模式 + 精准检索", Icon = (new Microsoft.FluentUI.AspNetCore.Components.Icons.Regular.Size16.AnimalTurtle(), Color.Neutral, "start"  ) } },
     };
 
     public string UserQuestion { get; set; }
