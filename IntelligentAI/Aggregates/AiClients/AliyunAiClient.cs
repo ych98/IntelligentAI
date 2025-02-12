@@ -10,6 +10,21 @@ namespace IntelligentAI.Aggregates.AiClients;
 
 public class AliyunAiClient(HttpClient httpClient) : AiClientBase(httpClient)
 {
+    public AliyunAiClient(HttpClient httpClient, string modelName, string apiKey, string? chatUrl) 
+        : this(httpClient)
+    {
+        ModelName = modelName;
+        ApiKey = apiKey;
+        ChatUrl = chatUrl ?? "/api/v1/services/aigc/text-generation/generation";
+    }
+
+    public AliyunAiClient(HttpClient httpClient, string modelName, string apiKey) : this(httpClient)
+    {
+        ModelName = modelName;
+        ApiKey = apiKey;
+        ChatUrl = "/api/v1/services/aigc/text-generation/generation";
+    }
+
     public override async Task<string> AnswerText(
         string question, 
         Dictionary<string, object>? parameters = null,
@@ -106,7 +121,7 @@ public class AliyunAiClient(HttpClient httpClient) : AiClientBase(httpClient)
                 headers.Select(h => new ValueTuple<object, object>(h.Key, h.Value))
                     .ToArray())
             .ReadJsonAsync<Dictionary<string, object>, Records.Aliyun.AliyunResult>(
-                url: "/api/v1/services/aigc/text-generation/generation",
+                url: ChatUrl,
                 method: HttpMethod.Post,
                 body: formatParameters,
                 cancellation: cancellation);
@@ -205,7 +220,7 @@ public class AliyunAiClient(HttpClient httpClient) : AiClientBase(httpClient)
                 headers.Select(h => new ValueTuple<object, object>(h.Key, h.Value))
                     .ToArray())
             .ReadStreamAsync<Dictionary<string, object>, string>(
-                url: "/api/v1/services/aigc/text-generation/generation",
+                url: ChatUrl,
                 method: HttpMethod.Post,
                 body: formatParameters,
                 cancellation: cancellation);

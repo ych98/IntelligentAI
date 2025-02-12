@@ -55,9 +55,9 @@ public static class AiClientFactoryExtensions
             {
                 AiClientBase model = service switch
                 {
-                    var s when s == ServiceEnum.Aliyun => new AliyunAiClient(http) { ServiceName = service.Name, ModelName = modelName, ApiKey = settings.ApiKey },
+                    var s when s == ServiceEnum.Aliyun => new AliyunAiClient(http, modelName, settings.ApiKey, settings.ChatUrl) { ServiceName = service.Name },
                     var s when s == ServiceEnum.Kimi => new KimiAiClient(http) { ServiceName = service.Name, ModelName = modelName, ApiKey = settings.ApiKey },
-                    var s when s == ServiceEnum.Azure => new AzureAiClient(http) { ServiceName = service.Name, ModelName = modelName, ApiKey = settings.ApiKey },
+                    var s when s == ServiceEnum.Azure => new AzureAiClient(http, modelName, settings.ApiKey, settings.ChatUrl) { ServiceName = service.Name },
                     var s when s == ServiceEnum.OpenAI => new OpenAiClient(http) { ServiceName = service.Name, ModelName = modelName, ApiKey = settings.ApiKey },
                     var s when s == ServiceEnum.Huoshan => new HuoshanAiClient(http) { ServiceName = service.Name, ModelName = modelName, ApiKey = settings.ApiKey },
                     var s when s == ServiceEnum.Baidu => new BaiduAiClient(http) { ServiceName = service.Name, ModelName = modelName, ApiKey = settings.ApiKey },

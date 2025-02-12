@@ -9,7 +9,7 @@
 	<Description>智能问答业务封装</Description>
 	<Platforms>AnyCPU;x86;x64</Platforms>
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
-	<PackageVersion>1.0.0</PackageVersion>
+	<PackageVersion>1.0.1</PackageVersion>
 	<PackageReleaseNotes>
 		- 使用 Rest Api 进行 Azure 问答
 	</PackageReleaseNotes>

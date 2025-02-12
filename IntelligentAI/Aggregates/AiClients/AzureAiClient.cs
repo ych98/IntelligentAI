@@ -224,6 +224,19 @@ namespace IntelligentAI.Aggregates.AiModels;
 
 public class AzureAiClient(HttpClient httpClient) : AiClientBase(httpClient)
 {
+    public AzureAiClient(HttpClient httpClient, string modelName, string apiKey, string? chatUrl) : this(httpClient)
+    {
+        ModelName = modelName;
+        ApiKey = apiKey;
+        ChatUrl = chatUrl ?? "/openai/deployments/fanai/chat/completions?api-version=2024-08-01-preview";
+    }
+
+    public AzureAiClient(HttpClient httpClient, string modelName, string apiKey) : this(httpClient)
+    {
+        ModelName = modelName;
+        ApiKey = apiKey;
+    }
+
     public override async Task<string> AnswerText(
         string question,
         Dictionary<string, object>? parameters = null,
@@ -307,7 +320,7 @@ public class AzureAiClient(HttpClient httpClient) : AiClientBase(httpClient)
         var azureResult = await httpClient
             .AddHeaders(("api-key", ApiKey))
             .ReadJsonAsync<Dictionary<string, object>, AzureResult>(
-                url: "/openai/deployments/fanai/chat/completions?api-version=2024-08-01-preview",
+                url: ChatUrl,
                 method: HttpMethod.Post,
                 body: formatParameters,
                 cancellation: cancellation);
@@ -395,7 +408,7 @@ public class AzureAiClient(HttpClient httpClient) : AiClientBase(httpClient)
         var azureStream = httpClient
             .AddHeaders(("api-key", ApiKey))
             .ReadStreamAsync<Dictionary<string, object>, string>(
-                url: "/openai/deployments/fanai/chat/completions?api-version=2024-08-01-preview",
+                url: ChatUrl,
                 method: HttpMethod.Post,
                 body: formatParameters, 
                 streamType: FluentHttpExtensions.EventStream,

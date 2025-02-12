@@ -13,11 +13,13 @@ public abstract class AiClientBase(HttpClient httpClient) : ApiClientBase(httpCl
 {
     public required string ServiceName { get; set; }
 
-    public required string ModelName { get; set; }
+    public string? ModelName { get; set; }
 
     public string ServiceKey => $"{ServiceName}-{ModelName}";
 
     public string? ApiKey { get; set; }
+
+    public string? ChatUrl { get; set; }
 
     public abstract Task<string> AnswerText(
         string question,
@@ -53,6 +55,8 @@ public class AIProviderSettings
     public required string Host { get; set; }
 
     public required string ApiKey { get; set; }
+
+    public string? ChatUrl { get; set; }
 
     public required List<string> Models { get; set; }
 }
