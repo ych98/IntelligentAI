@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 using IntelligentAI.ApiService.AspectInjectors;
 using IntelligentAI.ApiService.Applications;
 
-namespace IntelligentAI.ApiService.Controllers.StandardControllers;
+namespace IntelligentAI.ApiService.Controllers;
 
 [ApiController]
 [Route("[controller]/[action]")]
@@ -24,7 +24,7 @@ public class AiController : ControllerBase
     /// 
     /// </summary>
     /// <param name="request"></param>
-    /// <param name="modelEnum"> Default: 6. Model name is qwen-long. </param>
+    /// <param name="modelEnum"> Stable model id from configuration. </param>
     /// <param name="cancellation"></param>
     /// <returns></returns>    
     [HttpPost]
@@ -49,7 +49,7 @@ public class AiController : ControllerBase
     /// 
     /// </summary>
     /// <param name="request"></param>
-    /// <param name="modelEnum"> Default: 6. Model name is qwen-long. </param>
+    /// <param name="modelEnum"> Stable model id from configuration. </param>
     /// <param name="cancellation"></param>
     /// <returns></returns>
     [HttpPost]
@@ -79,7 +79,7 @@ public class AiController : ControllerBase
     /// 
     /// </summary>
     /// <param name="request"></param>
-    /// <param name="modelEnum"> Default: 6. Model name is qwen-long. </param>
+    /// <param name="modelEnum"> Stable model id from configuration. </param>
     /// <param name="streamType"> Default: false. ContentType is text/event-stream. Additional configuration for nginx is required. </param>
     /// <param name="cancellation"></param>
     /// <returns></returns>
@@ -190,13 +190,13 @@ public class AiController : ControllerBase
     }
 
     /// <summary>
-    /// 获取已实现的大模型Id 服务商名称 大模型Code
+    /// 获取已配置的大模型Id 服务商名称 大模型Code
     /// </summary>
     /// <returns></returns>    
     [HttpGet]
     public IActionResult GetClients()
     {
-        var modelInformations = ModelEnum.GetAll<ModelEnum>();
+        var modelInformations = _modelFactory.GetClients();
 
         return Ok(modelInformations);
     }

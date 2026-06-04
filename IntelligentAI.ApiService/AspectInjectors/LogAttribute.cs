@@ -4,6 +4,7 @@ using IntelligentAI.ApiService.AspectInjectors.Attributes;
 using IntelligentAI.ApiService.AspectInjectors.Events;
 using NLog.Extensions.Logging;
 using System.Diagnostics;
+using System.Runtime.ExceptionServices;
 
 namespace IntelligentAI.ApiService.AspectInjectors;
 
@@ -28,7 +29,7 @@ public class LogAttribute : MethodAspectAttribute
     public bool MeasureTime { get; set; } = false;
 
     // Whether to throw exception
-    public bool IgnoreException { get; set; } = true;
+    public bool IgnoreException { get; set; } = false;
 
     public ILogger Logger { get; set; }
 
@@ -122,7 +123,10 @@ public class LogAttribute : MethodAspectAttribute
 
         Logger.LogError(exception, $"Error in method {eventArgs.Name}: {exception.Message}");
 
-        if (!IgnoreException) throw exception;
+        if (!IgnoreException)
+        {
+            ExceptionDispatchInfo.Capture(exception).Throw();
+        }
 
         return default;
     }

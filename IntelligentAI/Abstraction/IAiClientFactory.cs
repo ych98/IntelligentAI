@@ -4,5 +4,7 @@ public interface IAiClientFactory
 {
     AiClientBase CreateClient(string serviceName, string modelName);
 
-    AiClientBase CreateClient(int modelEnum);
+    AiClientBase CreateClient(int modelId);
+
+    IReadOnlyCollection<AIModelSettings> GetClients();
 }

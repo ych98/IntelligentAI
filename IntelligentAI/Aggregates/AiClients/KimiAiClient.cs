@@ -19,8 +19,7 @@ public class KimiAiClient(HttpClient httpClient) : AiClientBase(httpClient)
 
         if (string.IsNullOrWhiteSpace(question)) throw new ArgumentNullException($"提问内容不能为空，请确保 question 参数的有效性");
 
-        // 校验模型名称
-        var model = ModelEnum.GetByDescription(ModelName);
+        var modelName = GetModelName();
 
         // 校验传入参数
         if (parameters is not null && parameters.Count > 0)
@@ -67,9 +66,9 @@ public class KimiAiClient(HttpClient httpClient) : AiClientBase(httpClient)
                 new Records.Universal.Message("user",question + "\n" + promptContent)
             };
 
-        formatParameters["model"] = model.Description;
+        formatParameters["model"] = modelName;
 
-        var aiResult = await CallAsync<Records.Kimi.KimiResult>("/v1/chat/completions", formatParameters, ApiKey,cancellation: cancellation);
+        var aiResult = await CallAsync<Records.Kimi.KimiResult>(GetChatUrl(), formatParameters, ApiKey,cancellation: cancellation);
 
         return aiResult.Choices.FirstOrDefault().Message.Content;
     }
@@ -84,8 +83,7 @@ public class KimiAiClient(HttpClient httpClient) : AiClientBase(httpClient)
 
         if (string.IsNullOrWhiteSpace(question)) throw new ArgumentNullException($"提问内容不能为空，请确保 question 参数的有效性");
 
-        // 校验模型名称
-        var model = ModelEnum.GetByDescription(ModelName);
+        var modelName = GetModelName();
 
         // 校验传入参数
         if (parameters is not null && parameters.Count > 0)
@@ -132,9 +130,9 @@ public class KimiAiClient(HttpClient httpClient) : AiClientBase(httpClient)
             new Records.Universal.Message("user",question + "\n" + promptContent)
         };  
 
-        formatParameters["model"] = model.Description;
+        formatParameters["model"] = modelName;
 
-        await foreach (var single in CallStreamAsync<string>("/v1/chat/completions", formatParameters, ApiKey, cancellation: cancellation))
+        await foreach (var single in CallStreamAsync<string>(GetChatUrl(), formatParameters, ApiKey, cancellation: cancellation))
         {
             if (string.IsNullOrWhiteSpace(single)) continue;
 
@@ -257,4 +255,16 @@ public class KimiAiClient(HttpClient httpClient) : AiClientBase(httpClient)
             }
         }
     };
+
+    private string GetModelName()
+    {
+        return string.IsNullOrWhiteSpace(ModelName)
+            ? throw new InvalidOperationException("ModelName 不能为空。")
+            : ModelName;
+    }
+
+    private string GetChatUrl()
+    {
+        return string.IsNullOrWhiteSpace(ChatUrl) ? "/v1/chat/completions" : ChatUrl;
+    }
 }

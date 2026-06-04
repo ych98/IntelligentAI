@@ -29,8 +29,7 @@ public class BaiduAiClient(HttpClient httpClient) : AiClientBase(httpClient)
 
         if (string.IsNullOrWhiteSpace(question)) throw new ArgumentNullException($"提问内容不能为空，请确保 question 参数的有效性");
 
-        // 校验模型名称
-        var model = ModelEnum.GetByDescription(ModelName);
+        var modelName = GetModelName();
 
         // 校验传入参数
         if (parameters is not null && parameters.Count > 0)
@@ -76,7 +75,7 @@ public class BaiduAiClient(HttpClient httpClient) : AiClientBase(httpClient)
                 new Records.Universal.Message("user", question + "\n" + promptContent)
             };
 
-        var modelUrl = ConvertToModelUrl(model.Description);
+        var modelUrl = ConvertToModelUrl(modelName);
 
         var keys = ApiKey.Split(";");
 
@@ -108,8 +107,7 @@ public class BaiduAiClient(HttpClient httpClient) : AiClientBase(httpClient)
 
         if (string.IsNullOrWhiteSpace(question)) throw new ArgumentNullException($"提问内容不能为空，请确保 question 参数的有效性");
 
-        // 校验模型名称
-        var model = ModelEnum.GetByDescription(ModelName);
+        var modelName = GetModelName();
 
         // 校验传入参数
         if (parameters is not null && parameters.Count > 0)
@@ -155,7 +153,7 @@ public class BaiduAiClient(HttpClient httpClient) : AiClientBase(httpClient)
             new Records.Universal.Message("user",question + "\n" + promptContent)
         };
 
-        var modelUrl = ConvertToModelUrl(model.Description);
+        var modelUrl = ConvertToModelUrl(modelName);
 
         var keys = ApiKey.Split(";");
 
@@ -297,10 +295,17 @@ public class BaiduAiClient(HttpClient httpClient) : AiClientBase(httpClient)
     {
         return description switch
         {
-            ModelEnum.ErnieSpeedCode => "ernie_speed",
-            ModelEnum.ErnieSpeedProCode => "ernie-speed-128k",
+            "ernie-speed-8k" => "ernie_speed",
+            "ernie-speed-128k" => "ernie-speed-128k",
             _ => throw new NotImplementedException($"未实现指定的服务名称模型适配器：{ServiceKey}。")
         };
+    }
+
+    private string GetModelName()
+    {
+        return string.IsNullOrWhiteSpace(ModelName)
+            ? throw new InvalidOperationException("ModelName 不能为空。")
+            : ModelName;
     }
 }
 

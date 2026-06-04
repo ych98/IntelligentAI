@@ -1,7 +1,7 @@
 using IntelligentAI.ApiService.Applications;
 using Microsoft.AspNetCore.Mvc;
 
-namespace IntelligentAI.ApiService.Controllers.StandardControllers
+namespace IntelligentAI.ApiService.Controllers
 {
     [ApiController]
     [Route("[controller]/[action]")]

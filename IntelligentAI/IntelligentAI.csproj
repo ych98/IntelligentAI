@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 	<PackageReadmeFile>README.md</PackageReadmeFile>
@@ -9,15 +9,17 @@
 	<Description>智能问答业务封装</Description>
 	<Platforms>AnyCPU;x86;x64</Platforms>
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
-	<PackageVersion>1.0.1</PackageVersion>
+	<PackageVersion>1.1.0</PackageVersion>
 	<PackageReleaseNotes>
-		- 使用 Rest Api 进行 Azure 问答
+		- 升级到 .NET 10
+		- 使用 FluentHttpFactory 1.2.2
+		- 支持配置驱动的模型编号和 OpenAI-compatible 适配
 	</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="FluentHttp.Json" Version="1.0.2" />
-    <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.1" />
+    <PackageReference Include="FluentHttpFactory" Version="1.2.2" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.0" />
   </ItemGroup>
 	
   <ItemGroup>

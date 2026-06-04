@@ -17,8 +17,7 @@ public class HuoshanAiClient(HttpClient httpClient) : AiClientBase(httpClient)
 
         if (string.IsNullOrWhiteSpace(question)) throw new ArgumentNullException($"提问内容不能为空，请确保 question 参数的有效性");
 
-        // 校验模型名称
-        var model = ModelEnum.GetByDescription(ModelName);
+        var modelName = GetModelName();
 
         // 校验传入参数
         if (parameters is not null && parameters.Count > 0)
@@ -65,9 +64,9 @@ public class HuoshanAiClient(HttpClient httpClient) : AiClientBase(httpClient)
                 new Records.Universal.Message("user", question + "\n" + promptContent)
             };
 
-        formatParameters["model"] = model.Description;
+        formatParameters["model"] = modelName;
 
-        var aiResult = await CallAsync<Records.Kimi.KimiResult>("/api/v3/chat/completions", formatParameters, ApiKey,cancellation: cancellation);
+        var aiResult = await CallAsync<Records.Kimi.KimiResult>(GetChatUrl(), formatParameters, ApiKey,cancellation: cancellation);
 
         return aiResult.Choices.FirstOrDefault().Message.Content;
     }
@@ -81,8 +80,7 @@ public class HuoshanAiClient(HttpClient httpClient) : AiClientBase(httpClient)
 
         if (string.IsNullOrWhiteSpace(question)) throw new ArgumentNullException($"提问内容不能为空，请确保 question 参数的有效性");
 
-        // 校验模型名称
-        var model = ModelEnum.GetByDescription(ModelName);
+        var modelName = GetModelName();
 
         // 校验传入参数
         if (parameters is not null && parameters.Count > 0)
@@ -129,9 +127,9 @@ public class HuoshanAiClient(HttpClient httpClient) : AiClientBase(httpClient)
             new Records.Universal.Message("user", question + "\n" + promptContent)
         };
 
-        formatParameters["model"] = ConvertToModelName(model.Description);
+        formatParameters["model"] = modelName;
 
-        await foreach (var message in CallStreamAsync<string>("/api/v3/chat/completions", formatParameters, ApiKey, cancellation: cancellation))
+        await foreach (var message in CallStreamAsync<string>(GetChatUrl(), formatParameters, ApiKey, cancellation: cancellation))
         {
             // 处理v2版本的接口返回内容
             string pattern = @"""content"":\s*""([^""]*)""";
@@ -248,14 +246,15 @@ public class HuoshanAiClient(HttpClient httpClient) : AiClientBase(httpClient)
         }
     };
 
-    private string ConvertToModelName(string description) 
+    private string GetModelName()
     {
-        return description switch
-        {
-            ModelEnum.GLM3Code => "ep-20240619092514-7rrqx",
-            ModelEnum.MistralCode => "ep-20240619092424-hnwf9",
-            ModelEnum.Llama3Code => "ep-20240619092214-dhjcb",
-            _ => throw new NotImplementedException($"未实现指定的服务名称模型适配器：{ServiceKey}。")
-        };
-    } 
+        return string.IsNullOrWhiteSpace(ModelName)
+            ? throw new InvalidOperationException("ModelName 不能为空。")
+            : ModelName;
+    }
+
+    private string GetChatUrl()
+    {
+        return string.IsNullOrWhiteSpace(ChatUrl) ? "/api/v3/chat/completions" : ChatUrl;
+    }
 }

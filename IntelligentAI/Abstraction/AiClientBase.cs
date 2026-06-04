@@ -52,11 +52,24 @@ public abstract class AiClientBase(HttpClient httpClient) : ApiClientBase(httpCl
 
 public class AIProviderSettings
 {
+    public required string Service { get; set; }
+
     public required string Host { get; set; }
 
     public required string ApiKey { get; set; }
 
     public string? ChatUrl { get; set; }
 
-    public required List<string> Models { get; set; }
+    public required List<AIModelSettings> Models { get; set; }
+}
+
+public class AIModelSettings
+{
+    public int Id { get; set; }
+
+    public required string Service { get; set; }
+
+    public required string Name { get; set; }
+
+    public string ServiceKey => $"{Service}-{Name}";
 }

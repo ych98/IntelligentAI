@@ -1,0 +1,36 @@
+name: Build
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Restore IntelligentAI
+        run: dotnet restore IntelligentAI/IntelligentAI.csproj
+
+      - name: Restore ApiService
+        run: dotnet restore IntelligentAI.ApiService/IntelligentAI.ApiService.csproj
+
+      - name: Build IntelligentAI
+        run: dotnet build IntelligentAI/IntelligentAI.csproj --configuration Release --no-restore
+
+      - name: Build ApiService
+        run: dotnet build IntelligentAI.ApiService/IntelligentAI.ApiService.csproj --configuration Release --no-restore

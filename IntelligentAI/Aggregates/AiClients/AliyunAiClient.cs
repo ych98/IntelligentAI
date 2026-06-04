@@ -3,7 +3,6 @@ using IntelligentAI.Records.Aliyun;
 using IntelligentAI.Records.Universal;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
-using FluentHttp.Json;
 using System.Linq;
 
 namespace IntelligentAI.Aggregates.AiClients;
@@ -40,8 +39,7 @@ public class AliyunAiClient(HttpClient httpClient) : AiClientBase(httpClient)
 
         if (string.IsNullOrWhiteSpace(question)) throw new ArgumentNullException($"提问内容不能为空，请确保 question 参数的有效性");
 
-        // 校验模型名称
-        var model = ModelEnum.GetByDescription(ModelName);
+        var modelName = GetModelName();
 
         // 校验传入参数
         if (parameters is not null && parameters.Count > 0)
@@ -107,24 +105,18 @@ public class AliyunAiClient(HttpClient httpClient) : AiClientBase(httpClient)
             {"messages",  messageList}
         };
 
-        formatParameters["model"] = model.Description;
+        formatParameters["model"] = modelName;
 
         var headers = AdditionalHeaders(stream: false);
 
         //var aiResult = await CallAsync<Records.Aliyun.AliyunResult>("/api/v1/services/aigc/text-generation/generation", formatParameters, ApiKey, additionalHeaders: headers, cancellation: cancellation);
 
-        var aliyunResult = await httpClient
-            .AddAuthentication(
-                scheme: FluentHttpExtensions.BearerScheme,
-                parameter: ApiKey)
-            .AddHeaders(
-                headers.Select(h => new ValueTuple<object, object>(h.Key, h.Value))
-                    .ToArray())
-            .ReadJsonAsync<Dictionary<string, object>, Records.Aliyun.AliyunResult>(
-                url: ChatUrl,
-                method: HttpMethod.Post,
-                body: formatParameters,
-                cancellation: cancellation);
+        var aliyunResult = await CallAsync<Dictionary<string, object>, Records.Aliyun.AliyunResult>(
+            url: GetChatUrl(),
+            args: formatParameters,
+            bearer: ApiKey,
+            additionalHeaders: headers,
+            cancellation: cancellation);
 
         return aliyunResult.Output.Choices.FirstOrDefault().Message.Content;
     }
@@ -141,8 +133,7 @@ public class AliyunAiClient(HttpClient httpClient) : AiClientBase(httpClient)
 
         if (string.IsNullOrWhiteSpace(question)) throw new ArgumentNullException($"提问内容不能为空，请确保 question 参数的有效性");
 
-        // 校验模型名称
-        var model = ModelEnum.GetByDescription(ModelName);
+        var modelName = GetModelName();
 
         // 校验传入参数
         if (parameters is not null && parameters.Count > 0)
@@ -208,24 +199,16 @@ public class AliyunAiClient(HttpClient httpClient) : AiClientBase(httpClient)
             {"messages",  messageList}
         };
 
-        formatParameters["model"] = model.Description;
+        formatParameters["model"] = modelName;
 
         var headers = AdditionalHeaders(stream: true);
 
-        var aliyunStream = httpClient
-            .AddAuthentication(
-                scheme: FluentHttpExtensions.BearerScheme,
-                parameter: ApiKey)
-            .AddHeaders(
-                headers.Select(h => new ValueTuple<object, object>(h.Key, h.Value))
-                    .ToArray())
-            .ReadStreamAsync<Dictionary<string, object>, string>(
-                url: ChatUrl,
-                method: HttpMethod.Post,
-                body: formatParameters,
-                cancellation: cancellation);
-
-        await foreach (var single in aliyunStream)
+        await foreach (var single in CallStreamAsync<Dictionary<string, object>, string>(
+            url: GetChatUrl(),
+            args: formatParameters,
+            bearer: ApiKey,
+            additionalHeaders: headers,
+            cancellation: cancellation))
         {
             if (string.IsNullOrWhiteSpace(single)) continue;
 
@@ -364,22 +347,22 @@ public class AliyunAiClient(HttpClient httpClient) : AiClientBase(httpClient)
     {
         return ModelName switch
         {
-            ModelEnum.AliLongCode => new Dictionary<string, string>()
+            "qwen-long" => new Dictionary<string, string>()
             {
                 ["X-DashScope-SSE"] = stream ? "enable" : "disable",
                 ["X-DashScope-DataInspection"] = "{\"input\":\"disable\", \"output\":\"disable\"}"
             },
-            ModelEnum.AliPlusCode => new Dictionary<string, string>()
+            "qwen-plus" => new Dictionary<string, string>()
             {
                 ["X-DashScope-SSE"] = stream ? "enable" : "disable",
                 ["X-DashScope-DataInspection"] = "{\"input\":\"disable\", \"output\":\"disable\"}"
             },
-            ModelEnum.AliTurboCode => new Dictionary<string, string>()
+            "qwen-turbo" => new Dictionary<string, string>()
             {
                 ["X-DashScope-SSE"] = stream ? "enable" : "disable",
                 ["X-DashScope-DataInspection"] = "{\"input\":\"disable\", \"output\":\"disable\"}"
             },
-            ModelEnum.AliMaxCode => new Dictionary<string, string>()
+            "qwen-max" => new Dictionary<string, string>()
             {
                 ["X-DashScope-SSE"] = stream ? "enable" : "disable",
                 ["X-DashScope-DataInspection"] = "{\"input\":\"disable\", \"output\":\"disable\"}"
@@ -390,5 +373,19 @@ public class AliyunAiClient(HttpClient httpClient) : AiClientBase(httpClient)
             }
         };
 
+    }
+
+    private string GetChatUrl()
+    {
+        return string.IsNullOrWhiteSpace(ChatUrl)
+            ? "/api/v1/services/aigc/text-generation/generation"
+            : ChatUrl;
+    }
+
+    private string GetModelName()
+    {
+        return string.IsNullOrWhiteSpace(ModelName)
+            ? throw new InvalidOperationException("ModelName 不能为空。")
+            : ModelName;
     }
 }
