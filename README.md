@@ -1,101 +1,274 @@
-# Code Setup
+# IntelligentAI
 
-## Getting Started
+`IntelligentAI` 是一个面向多家大模型服务商的 .NET 封装库。当前版本基于 .NET 10，使用配置文件注册模型，并通过稳定的模型编号调用具体模型。
 
-### Using our dotnet package
+## 安装
 
-To start using the Intelligent SDK from scratch,  you first need to install the main Nuget package in the project you want to use the components. You can use the NuGet package manager in your IDE for that or use the following command when using a CLI:
-
-```CSharp
-
+```bash
 dotnet add package IntelligentAI
-
 ```
 
-### Register Services
+当前主要依赖：
 
-Add the following in Program.cs:
-
-```CSharp 
-
-builder.Services.AddAiService(new AiOptions("intelligent api address"));
-
+```xml
+<PackageReference Include="FluentHttpFactory" Version="1.2.2" />
+<PackageReference Include="Microsoft.Extensions.Http" Version="10.0.0" />
 ```
 
-### Quick Start
+## 注册服务
 
-This is literally all you need in your services  to use intelligent components.
+在应用启动时注册 AI Client 工厂：
 
-```CSharp 
+```csharp
+builder.Services.AddAiClients();
+```
 
-private readonly IAiModelService _model;
+注册后可以通过 `IAiClientFactory` 获取模型 Client：
 
-public YourClass(IAiModelService model)
+```csharp
+public class DemoService
 {
-    _model = model;
+    private readonly IAiClientFactory _aiClientFactory;
+
+    public DemoService(IAiClientFactory aiClientFactory)
+    {
+        _aiClientFactory = aiClientFactory;
+    }
 }
-
 ```
 
-**Argument**
+## 配置模型
 
-```CSharp 
+在 `appsettings.json` 中配置 `AI` 节点。
 
-var request = new AiArguments("杭州西湖哪里好玩？");
-
-int model = 6;  // 编号为 6 代表阿里云在线 qwen-long 模型
-
-var _cts = new CancellationTokenSource();
-
-var promptId = "prompt10";
-
-var replaces = new Dictionary<string, string>()
+```json
 {
-    ["正文"] = Content  // 提示词占位符替换
-};
-
-```
-
-**Text answer**
-
-```CSharp 
-
-var answer = await  _model.AnswerTextAsync(request, model, cancellationToken: _cts.Token);
-
-```
-
-**Streaming answer**
-
-```CSharp 
-
-StringBuilder streamingContentBuilder = new StringBuilder();
-
-string botAnswer;
-
-// ReturnType: IAsyncEnumerable<string>
-// Requirements: .net 8.0 or above
-var stream = _model.AnswerStringsAsync(request, model, cancellationToken: _cts.Token);
-
-// ContentType: text/event-stream
-var stream = _model.AnswerStreamAsync(request, model, cancellationToken: _cts.Token);
-
-await foreach (var message in stream)
-{
-    streamingContentBuilder.Append(message);
-
-    // You can get the answer here
-    botAnswer = streamingContentBuilder.ToString(); 
+  "AI": [
+    {
+      "Service": "Kimi",
+      "Host": "https://api.moonshot.cn",
+      "ApiKey": "sk-kimi",
+      "Models": [
+        {
+          "Id": 1,
+          "Name": "moonshot-v1-8k"
+        }
+      ]
+    },
+    {
+      "Service": "Aliyun",
+      "Host": "https://dashscope.aliyuncs.com",
+      "ApiKey": "sk-aliyun",
+      "ChatUrl": "/api/v1/services/aigc/text-generation/generation",
+      "Models": [
+        {
+          "Id": 6,
+          "Name": "qwen-long"
+        }
+      ]
+    },
+    {
+      "Service": "OpenAI",
+      "Host": "https://dashscope.aliyuncs.com",
+      "ApiKey": "sk-aliyun",
+      "ChatUrl": "/compatible-mode/v1/chat/completions",
+      "Models": [
+        {
+          "Id": 17,
+          "Name": "qwen-long"
+        }
+      ]
+    },
+    {
+      "Service": "OpenAI",
+      "Host": "https://api.openai.com",
+      "ApiKey": "sk-openai",
+      "ChatUrl": "/v1/chat/completions",
+      "Models": [
+        {
+          "Id": 19,
+          "Name": "gpt-4o"
+        }
+      ]
+    }
+  ]
 }
-
-// Or you can get the full answer here
-botAnswer = streamingContentBuilder.ToString(); 
-
 ```
 
-**Prompt answer**
+### 配置说明
 
-```CSharp 
+- `Service` 决定使用哪个 Client。
+- `Host` 是服务商 API 根地址。
+- `ApiKey` 是服务商密钥。
+- `ChatUrl` 是聊天接口路径。
+- `Models[].Id` 是对调用方稳定暴露的模型编号，必须唯一。
+- `Models[].Name` 是实际传给服务商的模型名称。
 
-var answer = await _model.AnswerTextByPromptAsync(promptId, replaces, 6, cancellationToken);
+当前内置 Service 映射：
 
+```text
+Aliyun  -> AliyunAiClient
+Kimi    -> KimiAiClient
+Azure   -> AzureAiClient
+OpenAI  -> OpenAiClient
+Huoshan -> HuoshanAiClient
+Baidu   -> BaiduAiClient
+Google  -> GoogleAiClient
 ```
+
+只有当 `Service` 配置为 `OpenAI` 时，才会使用 OpenAI-compatible 请求格式。也就是说，阿里云、火山云等服务如果要通过 OpenAI 兼容接口调用，应把该配置项的 `Service` 写为 `OpenAI`，再自行配置对应的 `Host`、`ApiKey` 和 `ChatUrl`。
+
+## 文本问答
+
+通过模型编号创建 Client：
+
+```csharp
+var client = _aiClientFactory.CreateClient(6);
+
+var request = new AiArguments("hello");
+
+var answer = await client.AnswerText(
+    request.Question,
+    request.ToDictionary(),
+    request.Messages,
+    cancellation);
+```
+
+也可以通过 `Service + ModelName` 创建 Client：
+
+```csharp
+var client = _aiClientFactory.CreateClient("Aliyun", "qwen-long");
+```
+
+## 流式问答
+
+```csharp
+var client = _aiClientFactory.CreateClient(6);
+var request = new AiArguments("请介绍一下杭州西湖");
+
+await foreach (var message in client.AnswerStream(
+    request.Question,
+    request.ToDictionary(),
+    request.Messages,
+    cancellation))
+{
+    Console.Write(message);
+}
+```
+
+## 获取已配置模型
+
+```csharp
+var models = _aiClientFactory.GetClients();
+
+foreach (var model in models)
+{
+    Console.WriteLine($"{model.Id}: {model.Service} - {model.Name}");
+}
+```
+
+## 稳定模型编号
+
+推荐把 `Models[].Id` 视为对外契约，而不是把服务商模型名暴露给调用方。
+
+例如调用方长期传入：
+
+```text
+modelId = 6
+```
+
+服务端可以在配置中把编号 `6` 从旧模型切到新模型：
+
+```json
+{
+  "Id": 6,
+  "Name": "qwen-long-2026"
+}
+```
+
+调用方无需感知这次模型升级。
+
+## 自定义 Client
+
+如果要扩展新的服务商，可以继承 `AiClientBase`：
+
+```csharp
+public class MyAiClient : AiClientBase
+{
+    public MyAiClient(HttpClient httpClient) : base(httpClient)
+    {
+    }
+
+    public override Task<string> AnswerText(
+        string question,
+        Dictionary<string, object>? parameters = null,
+        Message[]? messages = null,
+        CancellationToken cancellation = default)
+    {
+        throw new NotImplementedException();
+    }
+
+    public override IAsyncEnumerable<string> AnswerStream(
+        string question,
+        Dictionary<string, object>? parameters = null,
+        Message[]? messages = null,
+        CancellationToken cancellation = default)
+    {
+        throw new NotImplementedException();
+    }
+
+    public override Task<string[]> AnswerImages(
+        string input,
+        Dictionary<string, object>? parameters = null,
+        CancellationToken cancellation = default)
+    {
+        throw new NotImplementedException();
+    }
+
+    public override Task<string> AnswerVideo(
+        string input,
+        Dictionary<string, object>? parameters = null,
+        CancellationToken cancellation = default)
+    {
+        throw new NotImplementedException();
+    }
+
+    protected override Dictionary<string, object> GetParameters(
+        string method,
+        Dictionary<string, object>? overrides = null,
+        MissingKeyBehavior missingKeyBehavior = MissingKeyBehavior.Error)
+    {
+        return new Dictionary<string, object>();
+    }
+}
+```
+
+然后注册：
+
+```csharp
+builder.Services.AddCustomAiClient<MyAiClient>(
+    "MyService",
+    new AIProviderSettings
+    {
+        Service = "MyService",
+        Host = "https://api.example.com",
+        ApiKey = "sk-example",
+        ChatUrl = "/v1/chat/completions",
+        Models =
+        [
+            new AIModelSettings
+            {
+                Id = 100,
+                Service = "MyService",
+                Name = "my-model"
+            }
+        ]
+    });
+```
+
+## 注意事项
+
+- `Id` 必须唯一，否则启动注册模型时会抛出异常。
+- `Service` 必须是已内置或已自定义注册的服务名。
+- `ChatUrl` 不会被库自动修正；如果服务商接口路径变化，请改配置。
+- `ApiKey` 请放在用户机密、环境变量或部署平台密钥中，不建议提交到仓库。
